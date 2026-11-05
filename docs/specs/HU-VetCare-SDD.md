@@ -39,7 +39,7 @@ Las rutas `/api/portal/...` y `/api/proveedor/...` filtran por el `propietarioId
 |---|---|
 | D1 | Esta especificación se redacta a partir del informe y la Lista de Producto, y queda sujeta a la aprobación del Product Owner. |
 | D2 | Usuarios e inicio de sesión viven en `ms-pacientes`, en colecciones separadas. Solo ese servicio firma JWT con RS256; los demás verifican con la clave pública. |
-| D3 | HU-001 cubre los 10 roles. Las cuentas de propietario y proveedor se vinculan con `propietarioId` o `proveedorId`. |
+| D3 | HU-001 cubre los 10 roles. Las cuentas de propietario y proveedor se vinculan con `propietarioId` o `proveedorId`. El primer administrador se crea al arrancar `ms-pacientes`, desde variables de entorno. |
 | D4 | El token dura 30 minutos y el cierre de sesión ocurre en el cliente. Un usuario desactivado conserva el acceso hasta que expire su token. |
 | D5 | Frontend en React + Vite + TypeScript, en `frontend/`, publicado como sitio estático en Render. Las llamadas van directo a cada API, con CORS. |
 | D6 | CI, errores globales y despliegue mínimo se montan desde el Sprint 1. HU-074 a HU-079 conservan su identificador y se cierran formalmente en el Sprint 4. |
@@ -114,6 +114,14 @@ Característica: HU-001 crear usuarios del personal con un rol asignado
     Dado que tengo un rol distinto de administrador
     Cuando intento crear un usuario
     Entonces el sistema responde 403
+  Escenario: Administrador inicial
+    Dado que no existe ningún administrador y están configuradas VETCARE_ADMIN_CORREO y VETCARE_ADMIN_CONTRASENA
+    Cuando ms-pacientes arranca
+    Entonces se crea un administrador activo con esos datos
+  Escenario: Administrador ya existente
+    Dado que ya existe un administrador
+    Cuando ms-pacientes arranca
+    Entonces no se crea ni se modifica ningún usuario
 ```
 
 ##### HU-002 — Iniciar sesión con mi correo y contraseña
@@ -438,7 +446,7 @@ Como recepcionista, quiero registrar una mascota con nombre, especie, raza, sexo
 |---|---|
 | Sprint · Prioridad · Puntos | Sprint 1 · Alta · 16 |
 | Microservicio | ms-pacientes |
-| Endpoint | `POST /api/mascotas` |
+| Endpoint | `POST /api/mascotas · GET /api/mascotas/{id}` |
 | Reglas de negocio | No aplica |
 | Desarrolla · Prueba · Verifica | Alejandro Gonzalez · Gabriel Ramirez · Bryan Garcia |
 | Criterio principal | Se registra una mascota activa asociada a un propietario existente. |

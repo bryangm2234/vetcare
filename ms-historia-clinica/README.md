@@ -17,18 +17,21 @@ Consultas, signos vitales, vacunación, laboratorio, fórmulas y hospitalizació
 |---|---|---|---|
 | `MONGODB_URI` | En la nube | `mongodb://localhost:27017` | Conexión a MongoDB, sin nombre de base de datos |
 | `PORT` | No | `8083` | Puerto HTTP. Render lo define automáticamente |
+| `JWT_PUBLIC_KEY` | Sí | Ninguno | Clave pública RSA en Base64 para validar los JWT |
 
 ## Ejecutar en PowerShell
 
+En local, el servicio lee las variables del archivo `.env` de la raíz del repositorio, que Git ignora. Agrega ahí `MONGODB_URI` si usas Atlas.
+
 ```powershell
+java scripts/GenerarClavesJwt.java   # desde la raíz, solo la primera vez
 cd ms-historia-clinica
-$env:MONGODB_URI = "mongodb://localhost:27017"
 .\mvnw.cmd spring-boot:run
 ```
 
 ## Probar
 
-Las pruebas no necesitan MongoDB en ejecución.
+Las pruebas unitarias no necesitan MongoDB. Las de integración solo corren si defines `MONGODB_TEST_URI`, y usan una base de datos de prueba aparte.
 
 ```powershell
 .\mvnw.cmd verify
@@ -41,8 +44,9 @@ Las pruebas no necesitan MongoDB en ejecución.
 | `GET /actuator/health` | Público | 200 si MongoDB responde; 503 si no |
 | `GET /swagger-ui.html` | Público | Documentación interactiva |
 | `GET /v3/api-docs` | Público | Contrato OpenAPI en JSON |
+| `GET /api/auditoria` | Administrador | Auditoría del servicio (HU-009) |
 
-Las rutas de negocio se agregan en la Etapa 3. Hasta que se implemente HU-003, cualquier otra ruta se rechaza.
+Las demás rutas exigen `Authorization: Bearer <token>`: responden 401 sin un token válido y 403 si el rol no está autorizado (HU-003). Los errores siguen el formato estándar de HU-079.
 
 Ejemplo de respuesta de `/actuator/health`:
 
