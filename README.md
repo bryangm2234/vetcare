@@ -27,3 +27,7 @@ Instala el JDK 17, crea el archivo `.env` local con `java scripts/GenerarClavesJ
 ```
 
 Las variables de entorno están en [.env.example](.env.example). Nunca guardes credenciales en el repositorio.
+
+## Despliegue
+
+La guía de Render y MongoDB Atlas está en [docs/DESPLIEGUE.md](docs/DESPLIEGUE.md). El flujo completo de atención se prueba con `scripts/flujo_completo.py`.

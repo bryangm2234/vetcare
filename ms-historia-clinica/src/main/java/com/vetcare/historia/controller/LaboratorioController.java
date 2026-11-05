@@ -1,6 +1,9 @@
 package com.vetcare.historia.controller;
 
 import com.vetcare.historia.dto.ItemPendienteResponse;
+import com.vetcare.historia.dto.MarcaFacturadoRequest;
+import com.vetcare.historia.model.OrdenLaboratorio;
+import com.vetcare.historia.service.MarcadorFacturacion;
 import com.vetcare.historia.dto.OrdenLaboratorioRequest;
 import com.vetcare.historia.dto.OrdenLaboratorioResponse;
 import com.vetcare.historia.dto.PaginaResponse;
@@ -18,6 +21,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -31,8 +35,10 @@ import org.springframework.web.bind.annotation.RestController;
 public class LaboratorioController {
 
     private final LaboratorioService laboratorioService;
+    private final MarcadorFacturacion marcador;
 
-    public LaboratorioController(LaboratorioService laboratorioService) {
+    public LaboratorioController(LaboratorioService laboratorioService, MarcadorFacturacion marcador) {
+        this.marcador = marcador;
         this.laboratorioService = laboratorioService;
     }
 
@@ -85,5 +91,14 @@ public class LaboratorioController {
     @ApiResponse(responseCode = "403", description = "El usuario no es veterinario")
     public List<OrdenLaboratorioResponse> resultados(@PathVariable String mascotaId) {
         return laboratorioService.deMascota(mascotaId);
+    }
+
+    @PatchMapping("/api/ordenes-laboratorio/items-facturados")
+    @PreAuthorize(Permisos.CAJERO)
+    @Operation(summary = "Marcar o liberar ítems facturados; lo invoca ms-facturacion")
+    @ApiResponse(responseCode = "200", description = "Ítems actualizados")
+    @ApiResponse(responseCode = "409", description = "Un ítem no existe o ya cambió de estado; no se aplica ningún cambio")
+    public void marcarFacturados(@Valid @RequestBody MarcaFacturadoRequest solicitud) {
+        marcador.marcar(OrdenLaboratorio.class, solicitud.ids(), solicitud.facturado());
     }
 }

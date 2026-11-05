@@ -4,6 +4,8 @@ import com.vetcare.historia.dto.AltaRequest;
 import com.vetcare.historia.dto.EvolucionRequest;
 import com.vetcare.historia.dto.HospitalizacionRequest;
 import com.vetcare.historia.dto.ItemPendienteResponse;
+import com.vetcare.historia.dto.MarcaFacturadoRequest;
+import com.vetcare.historia.service.MarcadorFacturacion;
 import com.vetcare.historia.model.Hospitalizacion;
 import com.vetcare.historia.security.Permisos;
 import com.vetcare.historia.service.HospitalizacionService;
@@ -31,8 +33,10 @@ import org.springframework.web.bind.annotation.RestController;
 public class HospitalizacionController {
 
     private final HospitalizacionService hospitalizacionService;
+    private final MarcadorFacturacion marcador;
 
-    public HospitalizacionController(HospitalizacionService hospitalizacionService) {
+    public HospitalizacionController(HospitalizacionService hospitalizacionService, MarcadorFacturacion marcador) {
+        this.marcador = marcador;
         this.hospitalizacionService = hospitalizacionService;
     }
 
@@ -73,5 +77,14 @@ public class HospitalizacionController {
     @ApiResponse(responseCode = "200", description = "Ítems pendientes")
     public List<ItemPendienteResponse> itemsPendientes() {
         return hospitalizacionService.itemsPendientes();
+    }
+
+    @PatchMapping("/items-facturados")
+    @PreAuthorize(Permisos.CAJERO)
+    @Operation(summary = "Marcar o liberar ítems facturados; lo invoca ms-facturacion")
+    @ApiResponse(responseCode = "200", description = "Ítems actualizados")
+    @ApiResponse(responseCode = "409", description = "Un ítem no existe o ya cambió de estado; no se aplica ningún cambio")
+    public void marcarFacturados(@Valid @RequestBody MarcaFacturadoRequest solicitud) {
+        marcador.marcar(Hospitalizacion.class, solicitud.ids(), solicitud.facturado());
     }
 }

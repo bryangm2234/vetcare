@@ -67,6 +67,8 @@ Las demás rutas exigen `Authorization: Bearer <token>`: responden 401 sin un to
 | `POST /api/vacunas` | Veterinario | HU-037 |
 | `GET /api/vacunas/alertas?dias=30` | Recepcionista | HU-038 |
 | `GET /api/portal/mascotas/{mascotaId}/carne` | Propietario | HU-039 |
+| `GET /api/portal/vacunas/pendientes` | Propietario | HU-071 |
+| `PATCH /api/consultas/items-facturados`, `/api/ordenes-laboratorio/items-facturados`, `/api/hospitalizaciones/items-facturados` | Cajero, administrador | HU-061 |
 | `POST /api/historias/{mascotaId}/adjuntos` | Veterinario | HU-040 |
 | `GET /api/adjuntos/{id}` | Veterinario | HU-040 |
 | `POST /api/consultas/{id}/ordenes-laboratorio` | Veterinario | HU-041 |

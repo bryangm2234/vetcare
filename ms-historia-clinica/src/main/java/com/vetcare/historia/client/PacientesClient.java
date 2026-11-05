@@ -18,6 +18,12 @@ public class PacientesClient {
         this.rest = builder.baseUrl(url).build();
     }
 
+    public MascotaInfo[] mascotasPropias() {
+        return LlamadaRemota.ejecutar("ms-pacientes", () -> rest.get().uri("/api/portal/mascotas")
+                .header(HttpHeaders.AUTHORIZATION, LlamadaRemota.autorizacion())
+                .retrieve().body(MascotaInfo[].class));
+    }
+
     public MascotaInfo mascota(String id) {
         return LlamadaRemota.ejecutar("ms-pacientes", () -> rest.get().uri("/api/mascotas/{id}", id)
                 .header(HttpHeaders.AUTHORIZATION, LlamadaRemota.autorizacion())

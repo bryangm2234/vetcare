@@ -105,6 +105,16 @@ public class VacunaService {
                 .toList();
     }
 
+    /** HU-071: dosis pendientes de las mascotas actuales del propietario. */
+    public List<AlertaVacunaResponse> pendientesDelPropietario() {
+        List<String> mascotas = java.util.Arrays.stream(pacientesClient.mascotasPropias()).map(MascotaInfo::id).toList();
+        LocalDate hoy = LocalDate.now();
+        return vacunaRepository.findByMascotaIdInAndVigenteTrueAndProximaDosisNotNullOrderByProximaDosis(mascotas).stream()
+                .map(v -> new AlertaVacunaResponse(v.getMascotaId(), v.getMascotaNombre(), v.getPropietarioId(), v.getVacuna(), v.getDosis(),
+                        v.getProximaDosis(), v.getProximaDosis().isBefore(hoy) ? "VENCIDA" : "PENDIENTE"))
+                .toList();
+    }
+
     public List<VacunaResponse> deMascota(String mascotaId) {
         return vacunaRepository.findByMascotaIdOrderByFechaDesc(mascotaId).stream().map(VacunaResponse::de).toList();
     }

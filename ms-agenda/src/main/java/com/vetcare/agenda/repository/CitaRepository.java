@@ -16,4 +16,10 @@ public interface CitaRepository extends MongoRepository<Cita, String> {
     List<Cita> findByFechaAndEstadoAndRecordatorioEnviadoFalse(LocalDate fecha, EstadoCita estado);
 
     List<Cita> findByTipoAndEstadoAndFacturadoFalse(TipoCita tipo, EstadoCita estado);
+
+    List<Cita> findByRecursoIdAndFechaBetween(String recursoId, LocalDate antes, LocalDate despues);
+
+    long countByTipoAndEstadoAndFechaBetween(TipoCita tipo, EstadoCita estado, LocalDate antes, LocalDate despues);
+
+    List<Cita> findByMascotaIdInAndEstadoInAndFechaGreaterThanEqualOrderByFechaAscHoraAsc(List<String> mascotas, List<EstadoCita> estados, LocalDate desde);
 }

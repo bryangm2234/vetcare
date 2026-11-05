@@ -4,12 +4,15 @@ import com.vetcare.agenda.dto.CitaPeluqueriaRequest;
 import com.vetcare.agenda.dto.CitaResponse;
 import com.vetcare.agenda.dto.HorarioRequest;
 import com.vetcare.agenda.dto.ItemPendienteResponse;
+import com.vetcare.agenda.dto.MarcaFacturadoRequest;
+import com.vetcare.agenda.model.Cita;
 import com.vetcare.agenda.dto.ServicioRealizadoRequest;
 import com.vetcare.agenda.model.Horario;
 import com.vetcare.agenda.model.TipoCita;
 import com.vetcare.agenda.security.Permisos;
 import com.vetcare.agenda.service.CitaService;
 import com.vetcare.agenda.service.HorarioService;
+import com.vetcare.agenda.service.MarcadorFacturacion;
 import com.vetcare.agenda.service.PeluqueriaService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -36,8 +39,11 @@ public class PeluqueriaController {
     private final HorarioService horarioService;
     private final CitaService citaService;
     private final PeluqueriaService peluqueriaService;
+    private final MarcadorFacturacion marcador;
 
-    public PeluqueriaController(HorarioService horarioService, CitaService citaService, PeluqueriaService peluqueriaService) {
+    public PeluqueriaController(HorarioService horarioService, CitaService citaService, PeluqueriaService peluqueriaService,
+                                MarcadorFacturacion marcador) {
+        this.marcador = marcador;
         this.horarioService = horarioService;
         this.citaService = citaService;
         this.peluqueriaService = peluqueriaService;
@@ -79,5 +85,14 @@ public class PeluqueriaController {
     @ApiResponse(responseCode = "200", description = "Ítems pendientes")
     public List<ItemPendienteResponse> itemsPendientes() {
         return peluqueriaService.itemsPendientes();
+    }
+
+    @PatchMapping("/items-facturados")
+    @PreAuthorize(Permisos.CAJERO)
+    @Operation(summary = "Marcar o liberar ítems facturados; lo invoca ms-facturacion")
+    @ApiResponse(responseCode = "200", description = "Ítems actualizados")
+    @ApiResponse(responseCode = "409", description = "Un ítem no existe o ya cambió de estado; no se aplica ningún cambio")
+    public void marcarFacturados(@Valid @RequestBody MarcaFacturadoRequest solicitud) {
+        marcador.marcar(Cita.class, solicitud.ids(), solicitud.facturado());
     }
 }

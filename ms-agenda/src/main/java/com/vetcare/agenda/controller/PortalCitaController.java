@@ -12,6 +12,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
+import java.util.List;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,13 +22,21 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/portal/citas")
-@Tag(name = "Portal del propietario", description = "HU-024")
+@Tag(name = "Portal del propietario", description = "HU-024 y HU-071")
 public class PortalCitaController {
 
     private final CitaService citaService;
 
     public PortalCitaController(CitaService citaService) {
         this.citaService = citaService;
+    }
+
+    @GetMapping
+    @PreAuthorize(Permisos.PROPIETARIO)
+    @Operation(summary = "Consultar las próximas citas de las mascotas propias")
+    @ApiResponse(responseCode = "200", description = "Citas programadas o en espera")
+    public List<CitaResponse> proximas() {
+        return citaService.proximasDelPropietario().stream().map(CitaResponse::de).toList();
     }
 
     @PostMapping

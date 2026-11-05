@@ -5,6 +5,7 @@ import com.vetcare.farmacia.dto.DespachoRequest;
 import com.vetcare.farmacia.dto.FormulaVigencia;
 import com.vetcare.farmacia.dto.ItemDespachoRequest;
 import com.vetcare.farmacia.dto.ItemPendienteResponse;
+import com.vetcare.farmacia.dto.VentasFarmaciaResponse;
 import com.vetcare.farmacia.exception.ConflictoException;
 import com.vetcare.farmacia.exception.DatosInvalidosException;
 import com.vetcare.farmacia.exception.ReglaNegocioException;
@@ -13,6 +14,8 @@ import com.vetcare.farmacia.model.ItemDespacho;
 import com.vetcare.farmacia.model.Medicamento;
 import com.vetcare.farmacia.model.TipoMovimiento;
 import com.vetcare.farmacia.repository.DespachoRepository;
+import java.time.Instant;
+import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -88,6 +91,19 @@ public class DespachoService {
                         d.getFecha().atZone(ZoneId.systemDefault()).toLocalDate(),
                         d.getItems().stream().mapToLong(i -> i.cantidad() * i.precioUnitario()).sum()))
                 .toList();
+    }
+
+    /** HU-072: ventas de farmacia del período. */
+    public VentasFarmaciaResponse ventas(LocalDate desde, LocalDate hasta) {
+        if (desde.isAfter(hasta)) {
+            throw new DatosInvalidosException("La fecha inicial es posterior a la final");
+        }
+        Instant inicio = desde.atStartOfDay(ZoneId.systemDefault()).toInstant().minusMillis(1);
+        Instant fin = hasta.plusDays(1).atStartOfDay(ZoneId.systemDefault()).toInstant();
+        List<Despacho> despachos = despachoRepository.findByFechaBetween(inicio, fin);
+        long unidades = despachos.stream().flatMap(d -> d.getItems().stream()).mapToLong(ItemDespacho::cantidad).sum();
+        long valor = despachos.stream().flatMap(d -> d.getItems().stream()).mapToLong(i -> i.cantidad() * i.precioUnitario()).sum();
+        return new VentasFarmaciaResponse(despachos.size(), unidades, valor);
     }
 
     private void validarContraFormula(DespachoRequest solicitud, FormulaVigencia formula) {

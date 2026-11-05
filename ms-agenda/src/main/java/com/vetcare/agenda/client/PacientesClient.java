@@ -27,6 +27,12 @@ public class PacientesClient {
                 .retrieve().body(MascotaInfo.class));
     }
 
+    public MascotaInfo[] mascotasPropias() {
+        return LlamadaRemota.ejecutar(SERVICIO, () -> rest.get().uri("/api/portal/mascotas")
+                .header(HttpHeaders.AUTHORIZATION, LlamadaRemota.autorizacion())
+                .retrieve().body(MascotaInfo[].class));
+    }
+
     public PropietarioInfo propietario(String id) {
         return LlamadaRemota.ejecutar(SERVICIO, () -> rest.get().uri("/api/propietarios/{id}", id)
                 .header(HttpHeaders.AUTHORIZATION, LlamadaRemota.autorizacion())

@@ -1,0 +1,24 @@
+name: Recordatorios de citas
+
+# HU-030: ejecución diaria externa. Se activa al definir los secretos del repositorio
+# AGENDA_URL y VETCARE_CLAVE_PROCESO. El horario está en UTC: 13:00 equivale a las 8:00 en Colombia.
+on:
+  schedule:
+    - cron: '0 13 * * *'
+  workflow_dispatch:
+
+jobs:
+  enviar:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Enviar recordatorios
+        env:
+          AGENDA_URL: ${{ secrets.AGENDA_URL }}
+          VETCARE_CLAVE_PROCESO: ${{ secrets.VETCARE_CLAVE_PROCESO }}
+        run: |
+          if [ -z "$AGENDA_URL" ] || [ -z "$VETCARE_CLAVE_PROCESO" ]; then
+            echo "Los secretos no están configurados; no se envían recordatorios."
+            exit 0
+          fi
+          curl --fail --silent --show-error --retry 5 --retry-delay 30 --max-time 120 -X POST \
+            -H "X-Clave-Proceso: $VETCARE_CLAVE_PROCESO" "$AGENDA_URL/api/recordatorios/ejecucion"

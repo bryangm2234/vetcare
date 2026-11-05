@@ -52,6 +52,9 @@ Las rutas `/api/portal/...` y `/api/proveedor/...` filtran por el `propietarioId
 | D13 | Adjuntos en GridFS sobre Atlas: PDF e imágenes de hasta 5 MB. |
 | D14 | Plan gratuito de Render en desarrollo, con reintentos entre servicios. Valorar un plan de pago para la entrega. |
 | D15 | Bryan Garcia verifica la Definición de Hecho y Julian Barney Jaimes, como Product Owner, acepta las historias. |
+| D17 | Una factura consolida todos los ítems pendientes de una mascota en los demás servicios. Medicamentos se cobran al precio guardado en el despacho; los demás, con la tarifa de su servicio y, en hospitalización, por día de estancia. |
+| D18 | Valores en pesos enteros. Impuesto calculado sobre el valor con descuento, con la tasa `VETCARE_TASA_IMPUESTO`, 19 % por defecto. |
+| D19 | Los ingresos por servicio reparten cada pago en proporción al valor de los ítems de su factura. |
 | D16 | Se conservan las 80 historias, se avanza primero la prioridad Alta y la Review del Sprint 2 se mueve porque el 16 de noviembre es festivo. La entrega final es el 1 de diciembre de 2026. |
 
 **Valores por defecto:**
@@ -2044,7 +2047,7 @@ Como cajero, quiero generar la factura de una atención con consulta, laboratori
 |---|---|
 | Sprint · Prioridad · Puntos | Sprint 4 · Alta · 32 |
 | Microservicio | ms-facturacion |
-| Endpoint | `POST /api/facturas` |
+| Endpoint | `POST /api/facturas · GET /api/facturas/{id} · PATCH .../items-facturados (en ms-agenda, ms-historia-clinica y ms-farmacia)` |
 | Reglas de negocio | No aplica |
 | Desarrolla · Prueba · Verifica | Gabriel Ramirez · Alejandro Gonzalez · Bryan Garcia |
 | Criterio principal | Consolida en una factura los ítems pendientes de la atención desde los demás servicios, con precios de la tarifa vigente, y evita cobrarlos dos veces. |
@@ -2072,6 +2075,14 @@ Característica: HU-061 generar la factura de una atención con consulta, labora
     Dado que un servicio no tiene tarifa vigente
     Cuando intento generar la factura
     Entonces el sistema responde 422 e indica el servicio
+  Escenario: Factura a crédito
+    Dado que la atención tiene ítems pendientes
+    Cuando genero la factura indicando que es a crédito
+    Entonces la factura queda en estado CREDITO
+  Escenario: Cobro simultáneo
+    Dado que otro cajero ya facturó un ítem mientras se generaba esta factura
+    Cuando se marcan los ítems como facturados
+    Entonces el sistema responde 409, revierte lo marcado y no crea la factura
 ```
 
 ##### HU-062 — Configurar las tarifas de los servicios

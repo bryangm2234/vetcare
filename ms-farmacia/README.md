@@ -59,6 +59,8 @@ Las demás rutas exigen `Authorization: Bearer <token>`: responden 401 sin un to
 | `POST /api/medicamentos/{id}/lotes` | Farmacia | HU-052 |
 | `POST /api/despachos` | Farmacia | HU-053 |
 | `GET /api/despachos/items-pendientes` | Cajero, administrador | HU-053 |
+| `PATCH /api/despachos/items-facturados` | Cajero, administrador | HU-061 |
+| `GET /api/reportes/ventas-farmacia?desde=&hasta=` | Administrador | HU-072 |
 | `GET /api/alertas/stock-minimo` | Farmacia, administrador | HU-054 |
 | `GET /api/medicamentos/{id}/kardex?desde=&hasta=` | Farmacia, administrador | HU-055 |
 | `POST /api/medicamentos/{id}/ajustes` | Farmacia | HU-055 |

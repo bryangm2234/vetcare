@@ -108,7 +108,7 @@ public class ConsultaService {
     public List<ItemPendienteResponse> itemsPendientes() {
         return consultaRepository.findByEstadoAndFacturadoFalse(EstadoConsulta.CERRADA).stream()
                 .map(c -> new ItemPendienteResponse(c.getId(), "CONSULTA", "Consulta: " + c.getDiagnostico(), c.getMascotaId(),
-                        c.getFechaCierre().atZone(ZoneId.systemDefault()).toLocalDate()))
+                        c.getFechaCierre().atZone(ZoneId.systemDefault()).toLocalDate(), 1))
                 .toList();
     }
 

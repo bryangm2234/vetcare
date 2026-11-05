@@ -66,6 +66,10 @@ Las demás rutas exigen `Authorization: Bearer <token>`: responden 401 sin un to
 | `GET /api/citas/mi-agenda?fecha=` | Veterinario | HU-027 |
 | `PATCH /api/citas/{id}/atencion` | Veterinario | HU-035 |
 | `POST /api/portal/citas` | Propietario | HU-024 |
+| `GET /api/portal/citas` | Propietario | HU-071 |
+| `GET /api/reportes/citas?desde=&hasta=` | Administrador | HU-072 |
+| `GET /api/reportes/ocupacion?veterinarioId=&desde=&hasta=` | Administrador | HU-073 |
+| `PATCH /api/peluqueria/items-facturados` | Cajero, administrador | HU-061 |
 | `PUT /api/peluqueria/horario` | Administrador | HU-028 |
 | `POST /api/peluqueria/citas` | Peluquería | HU-028 |
 | `PATCH /api/peluqueria/citas/{id}/servicio` | Peluquería | HU-029 |
