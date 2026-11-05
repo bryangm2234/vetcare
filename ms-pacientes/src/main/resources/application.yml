@@ -1,0 +1,21 @@
+spring:
+  application:
+    name: ms-pacientes
+  autoconfigure:
+    exclude: org.springframework.boot.security.autoconfigure.UserDetailsServiceAutoConfiguration
+  mongodb:
+    uri: ${MONGODB_URI:mongodb://localhost:27017}
+    database: vetcare_pacientes
+
+server:
+  port: ${PORT:8081}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html

@@ -1,0 +1,25 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        servicio: [ms-pacientes, ms-agenda, ms-historia-clinica, ms-farmacia, ms-facturacion]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: maven
+          cache-dependency-path: ${{ matrix.servicio }}/pom.xml
+      - name: Compilar y probar ${{ matrix.servicio }}
+        working-directory: ${{ matrix.servicio }}
+        run: sh mvnw -B verify

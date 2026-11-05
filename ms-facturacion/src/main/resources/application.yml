@@ -1,0 +1,21 @@
+spring:
+  application:
+    name: ms-facturacion
+  autoconfigure:
+    exclude: org.springframework.boot.security.autoconfigure.UserDetailsServiceAutoConfiguration
+  mongodb:
+    uri: ${MONGODB_URI:mongodb://localhost:27017}
+    database: vetcare_facturacion
+
+server:
+  port: ${PORT:8085}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
