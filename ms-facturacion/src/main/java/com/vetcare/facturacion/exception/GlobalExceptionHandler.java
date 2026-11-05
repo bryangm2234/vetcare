@@ -43,6 +43,11 @@ public class GlobalExceptionHandler {
         return error(HttpStatus.BAD_REQUEST, "La solicitud tiene un formato o un valor no válido", request);
     }
 
+    @ExceptionHandler(DatosInvalidosException.class)
+    public ResponseEntity<ApiError> datosInvalidos(DatosInvalidosException ex, HttpServletRequest request) {
+        return error(HttpStatus.BAD_REQUEST, ex.getMessage(), request);
+    }
+
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<ApiError> accesoDenegado(AccessDeniedException ex, HttpServletRequest request) {
         return error(HttpStatus.FORBIDDEN, "No tiene permisos para realizar esta operación", request);

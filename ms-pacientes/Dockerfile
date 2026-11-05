@@ -10,6 +10,7 @@ RUN useradd --system --no-create-home vetcare
 WORKDIR /app
 COPY --from=build /app/target/ms-pacientes.jar app.jar
 USER vetcare
+ENV TZ=America/Bogota
 ENV JAVA_TOOL_OPTIONS="-XX:MaxRAMPercentage=75"
 EXPOSE 8081
 ENTRYPOINT ["java", "-jar", "app.jar"]

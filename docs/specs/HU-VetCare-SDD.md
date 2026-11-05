@@ -47,8 +47,8 @@ Las rutas `/api/portal/...` y `/api/proveedor/...` filtran por el `propietarioId
 | D8 | El veterinario puede anular una fórmula con motivo, dentro de HU-045. |
 | D9 | Los ajustes de inventario, con motivo y auditoría, se incluyen en HU-055. |
 | D10 | La fórmula admite varios ítems con cantidad pendiente propia. Estados: `VIGENTE`, `PARCIAL`, `DESPACHADA`, `VENCIDA` y `ANULADA`. |
-| D11 | Una vacuna aplicada descuenta su lote en `ms-farmacia`. En hospitalización solo se administra lo ya formulado y despachado. |
-| D12 | Correo por SMTP con credenciales en variables de entorno. HU-030 se dispara con una ejecución diaria externa, como GitHub Actions. |
+| D11 | Una vacuna aplicada descuenta su lote en `ms-farmacia`. En hospitalización solo se administra lo ya formulado y despachado. Hasta el Sprint 3, sin `FARMACIA_URL`, la dosis queda marcada con inventario sin descontar. |
+| D12 | Correo por SMTP con credenciales en variables de entorno. HU-030 se dispara con una ejecución diaria externa, como GitHub Actions, autenticada con la clave `VETCARE_CLAVE_PROCESO`. |
 | D13 | Adjuntos en GridFS sobre Atlas: PDF e imágenes de hasta 5 MB. |
 | D14 | Plan gratuito de Render en desarrollo, con reintentos entre servicios. Valorar un plan de pago para la entrega. |
 | D15 | Bryan Garcia verifica la Definición de Hecho y Julian Barney Jaimes, como Product Owner, acepta las historias. |
@@ -742,7 +742,7 @@ Como recepcionista, quiero agendar una cita indicando mascota, veterinario, fech
 |---|---|
 | Sprint · Prioridad · Puntos | Sprint 2 · Alta · 24 |
 | Microservicio | ms-agenda |
-| Endpoint | `POST /api/citas` |
+| Endpoint | `POST /api/citas · GET /api/citas/{id}` |
 | Reglas de negocio | RN-03 |
 | Desarrolla · Prueba · Verifica | Gabriel Ramirez · Alejandro Gonzalez · Bryan Garcia |
 | Criterio principal | Solo se agenda dentro del horario del veterinario, con cupo disponible, en una franja libre y para una mascota activa. |
@@ -768,6 +768,10 @@ Característica: HU-022 agendar una cita indicando mascota, veterinario, fecha, 
     Entonces el sistema responde 422
   Escenario: Mascota no activa
     Dado que la mascota está INACTIVA o FALLECIDA
+    Cuando intento agendar
+    Entonces el sistema responde 422
+  Escenario: Fecha pasada
+    Dado que la fecha de la cita ya pasó
     Cuando intento agendar
     Entonces el sistema responde 422
   Escenario: Servicio de pacientes no disponible
@@ -1022,6 +1026,10 @@ Característica: HU-030 recibir un recordatorio de la cita 24 horas antes
     Dado que el servicio de correo falla
     Cuando se ejecuta el proceso diario
     Entonces se registra el error y la cita queda pendiente para un nuevo intento
+  Escenario: Clave incorrecta
+    Dado que la petición no trae la clave del proceso en la cabecera X-Clave-Proceso
+    Cuando se llama al endpoint
+    Entonces el sistema responde 403 y no envía correos
 ```
 
 #### Épica 4: Historia clínica y vacunación
@@ -1162,7 +1170,7 @@ Como veterinario, quiero cerrar la consulta, para que quede inmodificable y pase
 |---|---|
 | Sprint · Prioridad · Puntos | Sprint 2 · Alta · 16 |
 | Microservicio | ms-historia-clinica |
-| Endpoint | `PATCH /api/consultas/{id}/cierre · GET /api/consultas/items-pendientes` |
+| Endpoint | `PATCH /api/consultas/{id}/cierre · GET /api/consultas/items-pendientes · PATCH /api/citas/{id}/atencion (ms-agenda)` |
 | Reglas de negocio | No aplica |
 | Desarrolla · Prueba · Verifica | Alejandro Gonzalez · Gabriel Ramirez · Bryan Garcia |
 | Criterio principal | La consulta con diagnóstico se cierra, queda inmodificable y pasa a ítems pendientes de facturar. |
@@ -1246,6 +1254,14 @@ Característica: HU-037 registrar la vacuna aplicada con lote y fecha
     Dado que el lote no tiene unidades disponibles
     Cuando intento registrar la dosis
     Entonces el sistema responde 409 y no registra la dosis
+  Escenario: Esquema completo
+    Dado que la mascota ya recibió todas las dosis del esquema
+    Cuando intento registrar otra dosis
+    Entonces el sistema responde 422
+  Escenario: Farmacia sin configurar
+    Dado que FARMACIA_URL no está configurada mientras ms-farmacia no se implementa (Sprint 3)
+    Cuando registro la dosis
+    Entonces la dosis se guarda marcada con inventario sin descontar
   Escenario: Fecha futura
     Dado que la fecha de aplicación es futura
     Cuando intento registrar la dosis
