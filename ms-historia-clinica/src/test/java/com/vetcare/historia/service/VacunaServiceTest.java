@@ -75,14 +75,13 @@ class VacunaServiceTest {
     void rn01_laDosisUnoCalculaLaSiguienteConElIntervalo() {
         mascotaConEsquema();
         when(vacunaRepository.findByMascotaIdAndVacunaOrderByDosisDesc("m1", "Rabia")).thenReturn(List.of());
-        when(farmaciaClient.descontarVacuna("L-100")).thenReturn(true);
         when(vacunaRepository.save(any(Vacuna.class))).thenAnswer(i -> i.getArgument(0));
 
         VacunaResponse respuesta = vacunaService.registrar(solicitud, "v1");
 
         assertThat(respuesta.dosis()).isEqualTo(1);
         assertThat(respuesta.proximaDosis()).isEqualTo(LocalDate.of(2027, 11, 12));
-        assertThat(respuesta.inventarioDescontado()).isTrue();
+        verify(farmaciaClient).descontarVacuna("L-100");
     }
 
     @Test
@@ -122,7 +121,7 @@ class VacunaServiceTest {
     void hu037_loteSinStockNoRegistraLaDosis() {
         mascotaConEsquema();
         when(vacunaRepository.findByMascotaIdAndVacunaOrderByDosisDesc("m1", "Rabia")).thenReturn(List.of());
-        when(farmaciaClient.descontarVacuna("L-100")).thenThrow(new ConflictoException("Stock insuficiente"));
+        org.mockito.Mockito.doThrow(new ConflictoException("Stock insuficiente")).when(farmaciaClient).descontarVacuna("L-100");
 
         assertThatThrownBy(() -> vacunaService.registrar(solicitud, "v1")).isInstanceOf(ConflictoException.class);
         verify(vacunaRepository, never()).save(any());

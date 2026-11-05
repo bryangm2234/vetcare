@@ -20,7 +20,7 @@ Consultas, signos vitales, vacunación, laboratorio, fórmulas y hospitalizació
 | `JWT_PUBLIC_KEY` | Sí | Ninguno | Clave pública RSA en Base64 para validar los JWT |
 | `PACIENTES_URL` | En la nube | `http://localhost:8081` | URL de ms-pacientes |
 | `AGENDA_URL` | En la nube | `http://localhost:8082` | URL de ms-agenda |
-| `FARMACIA_URL` | Desde el Sprint 3 | Ninguno | URL de ms-farmacia. Sin ella, la vacuna queda con inventario sin descontar |
+| `FARMACIA_URL` | En la nube | `http://localhost:8084` | URL de ms-farmacia |
 
 ## Ejecutar en PowerShell
 
@@ -51,7 +51,7 @@ Las pruebas unitarias no necesitan MongoDB. Las de integración solo corren si d
 
 Las demás rutas exigen `Authorization: Bearer <token>`: responden 401 sin un token válido y 403 si el rol no está autorizado (HU-003). Los errores siguen el formato estándar de HU-079.
 
-### Consultas y vacunación
+### Consultas, vacunación, laboratorio, fórmulas y hospitalización
 
 | Ruta | Rol | Historia |
 |---|---|---|
@@ -69,8 +69,22 @@ Las demás rutas exigen `Authorization: Bearer <token>`: responden 401 sin un to
 | `GET /api/portal/mascotas/{mascotaId}/carne` | Propietario | HU-039 |
 | `POST /api/historias/{mascotaId}/adjuntos` | Veterinario | HU-040 |
 | `GET /api/adjuntos/{id}` | Veterinario | HU-040 |
+| `POST /api/consultas/{id}/ordenes-laboratorio` | Veterinario | HU-041 |
+| `GET /api/ordenes-laboratorio?estado=PENDIENTE` | Laboratorio | HU-042 |
+| `PUT /api/ordenes-laboratorio/{id}/resultado` | Laboratorio | HU-043 |
+| `GET /api/ordenes-laboratorio/items-pendientes` | Cajero, administrador | HU-043 |
+| `GET /api/historias/{mascotaId}/resultados-laboratorio` | Veterinario | HU-044 |
+| `POST /api/formulas` | Veterinario | HU-045 |
+| `PATCH /api/formulas/{id}/anulacion` | Veterinario | HU-045 |
+| `GET /api/formulas/{id}/vigencia` | Farmacia, veterinario | HU-046 |
+| `PATCH /api/formulas/{id}/despachos` | Farmacia | HU-053 |
+| `POST /api/hospitalizaciones` | Veterinario | HU-047 |
+| `POST /api/hospitalizaciones/{id}/evoluciones` | Auxiliar veterinario | HU-048 |
+| `PATCH /api/hospitalizaciones/{id}/alta` | Veterinario | HU-049 |
+| `GET /api/hospitalizaciones/items-pendientes` | Cajero, administrador | HU-049 |
+| `GET /api/portal/mascotas/{mascotaId}/resultados-formulas` | Propietario | HU-050 |
 
-Este servicio necesita ms-pacientes y ms-agenda en ejecución. Laboratorio, fórmulas y hospitalización llegan en el Sprint 3.
+Este servicio necesita ms-pacientes, ms-agenda y ms-farmacia en ejecución.
 
 ## Errores comunes
 
@@ -79,6 +93,8 @@ Este servicio necesita ms-pacientes y ms-agenda en ejecución. Laboratorio, fór
 | 503 al abrir o cerrar una consulta | ms-agenda no responde | Arráncalo o revisa `AGENDA_URL` |
 | 422 "La cita no está en espera" | Falta registrar la llegada | Usa `PATCH /api/citas/{id}/llegada` en ms-agenda |
 | 422 al registrar una vacuna | La vacuna no tiene esquema para la especie | Créalo con `POST /api/esquemas-vacunacion` |
+| 503 al emitir una fórmula o registrar una vacuna | ms-farmacia no responde | Arráncalo o revisa `FARMACIA_URL` |
+| 404 al registrar una vacuna | El lote no existe | Regístralo en ms-farmacia |
 | 413 al adjuntar | El archivo supera los 5 MB | Reduce el archivo |
 
 Ejemplo de respuesta de `/actuator/health`:

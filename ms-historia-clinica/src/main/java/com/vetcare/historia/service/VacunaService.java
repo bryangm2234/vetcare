@@ -68,7 +68,7 @@ public class VacunaService {
             throw new ReglaNegocioException("La mascota ya recibió todas las dosis del esquema");
         }
 
-        boolean descontado = farmaciaClient.descontarVacuna(solicitud.lote().trim());
+        farmaciaClient.descontarVacuna(solicitud.lote().trim());
 
         Vacuna vacuna = new Vacuna();
         vacuna.setMascotaId(mascota.id());
@@ -79,7 +79,6 @@ public class VacunaService {
         vacuna.setLote(solicitud.lote().trim());
         vacuna.setFecha(solicitud.fecha());
         vacuna.setProximaDosis(proximaDosis(solicitud.fecha(), dosis, esquema));
-        vacuna.setInventarioDescontado(descontado);
         vacuna.setVeterinarioId(veterinarioId);
         Vacuna guardada = vacunaRepository.save(vacuna);
 

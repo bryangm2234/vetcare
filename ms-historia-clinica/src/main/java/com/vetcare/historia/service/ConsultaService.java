@@ -112,7 +112,7 @@ public class ConsultaService {
                 .toList();
     }
 
-    private Consulta abierta(String id) {
+    public Consulta abierta(String id) {
         Consulta consulta = buscar(id);
         if (consulta.getEstado() == EstadoConsulta.CERRADA) {
             throw new ReglaNegocioException("La consulta está cerrada");

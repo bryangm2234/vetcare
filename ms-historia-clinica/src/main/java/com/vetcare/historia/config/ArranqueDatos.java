@@ -2,6 +2,7 @@ package com.vetcare.historia.config;
 
 import com.vetcare.historia.model.Consulta;
 import com.vetcare.historia.model.EsquemaVacunacion;
+import com.vetcare.historia.model.Hospitalizacion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
@@ -32,6 +33,8 @@ public class ArranqueDatos {
             mongoTemplate.indexOps(Consulta.class).createIndex(new Index().on("citaId", Sort.Direction.ASC).unique());
             mongoTemplate.indexOps(EsquemaVacunacion.class).createIndex(
                     new Index().on("especie", Sort.Direction.ASC).on("vacuna", Sort.Direction.ASC).unique());
+            mongoTemplate.indexOps(Hospitalizacion.class).createIndex(new Index().on("cubiculoOcupado", Sort.Direction.ASC).unique().sparse());
+            mongoTemplate.indexOps(Hospitalizacion.class).createIndex(new Index().on("mascotaInternada", Sort.Direction.ASC).unique().sparse());
         } catch (DataAccessException ex) {
             log.warn("No se pudieron crear los índices porque MongoDB no respondió: {}", ex.getMessage());
         }
