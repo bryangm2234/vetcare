@@ -31,8 +31,7 @@ jobs:
             fi
             sleep 2
           done
-          echo "::error::MongoDB no arranco: $(docker logs --tail 15 mongodb 2>&1 | tr '
-' ' ' | cut -c1-1500)"
+          echo "::error::MongoDB no arranco: $(docker logs --tail 15 mongodb 2>&1 | tr -s '[:space:]' ' ' | cut -c1-1500)"
           exit 1
       - name: Compilar y probar ${{ matrix.servicio }}
         working-directory: ${{ matrix.servicio }}
