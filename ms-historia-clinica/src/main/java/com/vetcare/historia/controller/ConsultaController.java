@@ -3,6 +3,9 @@ package com.vetcare.historia.controller;
 import com.vetcare.historia.dto.AperturaConsultaRequest;
 import com.vetcare.historia.dto.ConsultaResponse;
 import com.vetcare.historia.dto.ItemPendienteResponse;
+import com.vetcare.historia.dto.MarcaFacturadoRequest;
+import com.vetcare.historia.model.Consulta;
+import com.vetcare.historia.service.MarcadorFacturacion;
 import com.vetcare.historia.dto.RegistroClinicoRequest;
 import com.vetcare.historia.security.Permisos;
 import com.vetcare.historia.service.ConsultaService;
@@ -31,8 +34,10 @@ import org.springframework.web.bind.annotation.RestController;
 public class ConsultaController {
 
     private final ConsultaService consultaService;
+    private final MarcadorFacturacion marcador;
 
-    public ConsultaController(ConsultaService consultaService) {
+    public ConsultaController(ConsultaService consultaService, MarcadorFacturacion marcador) {
+        this.marcador = marcador;
         this.consultaService = consultaService;
     }
 
@@ -84,5 +89,14 @@ public class ConsultaController {
     @ApiResponse(responseCode = "503", description = "ms-agenda no está disponible; la consulta sigue abierta")
     public ConsultaResponse cerrar(@PathVariable String id) {
         return consultaService.cerrar(id);
+    }
+
+    @PatchMapping("/items-facturados")
+    @PreAuthorize(Permisos.CAJERO)
+    @Operation(summary = "Marcar o liberar ítems facturados; lo invoca ms-facturacion")
+    @ApiResponse(responseCode = "200", description = "Ítems actualizados")
+    @ApiResponse(responseCode = "409", description = "Un ítem no existe o ya cambió de estado; no se aplica ningún cambio")
+    public void marcarFacturados(@Valid @RequestBody MarcaFacturadoRequest solicitud) {
+        marcador.marcar(Consulta.class, solicitud.ids(), solicitud.facturado());
     }
 }

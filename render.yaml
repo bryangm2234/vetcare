@@ -1,0 +1,123 @@
+# Blueprint de Render. Los valores con sync: false se piden al crear los servicios y no se guardan aquí.
+services:
+  - type: web
+    name: vetcare-ms-pacientes
+    runtime: docker
+    rootDir: ms-pacientes
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    plan: free
+    branch: main
+    autoDeploy: true
+    healthCheckPath: /actuator/health
+    envVars:
+      - key: MONGODB_URI
+        sync: false
+      - key: JWT_PUBLIC_KEY
+        sync: false
+      - key: JWT_PRIVATE_KEY
+        sync: false
+      - key: VETCARE_ADMIN_CORREO
+        sync: false
+      - key: VETCARE_ADMIN_CONTRASENA
+        sync: false
+  - type: web
+    name: vetcare-ms-agenda
+    runtime: docker
+    rootDir: ms-agenda
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    plan: free
+    branch: main
+    autoDeploy: true
+    healthCheckPath: /actuator/health
+    envVars:
+      - key: MONGODB_URI
+        sync: false
+      - key: JWT_PUBLIC_KEY
+        sync: false
+      - key: PACIENTES_URL
+        sync: false
+      - key: VETCARE_CLAVE_PROCESO
+        sync: false
+      - key: VETCARE_CORREO_REMITENTE
+        sync: false
+      - key: SPRING_MAIL_HOST
+        sync: false
+      - key: SPRING_MAIL_PORT
+        sync: false
+      - key: SPRING_MAIL_USERNAME
+        sync: false
+      - key: SPRING_MAIL_PASSWORD
+        sync: false
+  - type: web
+    name: vetcare-ms-historia-clinica
+    runtime: docker
+    rootDir: ms-historia-clinica
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    plan: free
+    branch: main
+    autoDeploy: true
+    healthCheckPath: /actuator/health
+    envVars:
+      - key: MONGODB_URI
+        sync: false
+      - key: JWT_PUBLIC_KEY
+        sync: false
+      - key: PACIENTES_URL
+        sync: false
+      - key: AGENDA_URL
+        sync: false
+      - key: FARMACIA_URL
+        sync: false
+  - type: web
+    name: vetcare-ms-farmacia
+    runtime: docker
+    rootDir: ms-farmacia
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    plan: free
+    branch: main
+    autoDeploy: true
+    healthCheckPath: /actuator/health
+    envVars:
+      - key: MONGODB_URI
+        sync: false
+      - key: JWT_PUBLIC_KEY
+        sync: false
+      - key: HISTORIA_URL
+        sync: false
+  - type: web
+    name: vetcare-ms-facturacion
+    runtime: docker
+    rootDir: ms-facturacion
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    plan: free
+    branch: main
+    autoDeploy: true
+    healthCheckPath: /actuator/health
+    envVars:
+      - key: MONGODB_URI
+        sync: false
+      - key: JWT_PUBLIC_KEY
+        sync: false
+      - key: PACIENTES_URL
+        sync: false
+      - key: AGENDA_URL
+        sync: false
+      - key: HISTORIA_URL
+        sync: false
+      - key: FARMACIA_URL
+        sync: false
+      - key: VETCARE_CORREO_REMITENTE
+        sync: false
+      - key: SPRING_MAIL_HOST
+        sync: false
+      - key: SPRING_MAIL_PORT
+        sync: false
+      - key: SPRING_MAIL_USERNAME
+        sync: false
+      - key: SPRING_MAIL_PASSWORD
+        sync: false

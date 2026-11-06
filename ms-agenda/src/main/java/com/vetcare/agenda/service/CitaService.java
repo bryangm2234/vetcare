@@ -131,6 +131,13 @@ public class CitaService {
         return citaRepository.save(cita);
     }
 
+    /** HU-071: parte de las mascotas actuales del propietario, por si alguna fue transferida. */
+    public List<Cita> proximasDelPropietario() {
+        List<String> mascotas = java.util.Arrays.stream(pacientesClient.mascotasPropias()).map(MascotaInfo::id).toList();
+        return citaRepository.findByMascotaIdInAndEstadoInAndFechaGreaterThanEqualOrderByFechaAscHoraAsc(
+                mascotas, List.of(EstadoCita.PROGRAMADA, EstadoCita.EN_ESPERA), LocalDate.now());
+    }
+
     public List<Cita> agendaDe(String veterinarioId, LocalDate fecha) {
         return citaRepository.findByRecursoIdAndFechaOrderByHora(veterinarioId, fecha);
     }

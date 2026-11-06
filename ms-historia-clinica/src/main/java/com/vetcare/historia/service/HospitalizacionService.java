@@ -92,7 +92,7 @@ public class HospitalizacionService {
     public List<ItemPendienteResponse> itemsPendientes() {
         return hospitalizacionRepository.findByEstadoAndFacturadoFalse(EstadoHospitalizacion.FINALIZADA).stream()
                 .map(h -> new ItemPendienteResponse(h.getId(), "HOSPITALIZACION", "Estancia de " + h.getDiasEstancia() + " días", h.getMascotaId(),
-                        h.getFechaAlta().atZone(ZoneId.systemDefault()).toLocalDate()))
+                        h.getFechaAlta().atZone(ZoneId.systemDefault()).toLocalDate(), (int) h.getDiasEstancia()))
                 .toList();
     }
 

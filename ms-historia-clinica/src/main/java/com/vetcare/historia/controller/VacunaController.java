@@ -73,6 +73,14 @@ public class VacunaController {
         return vacunaService.alertas(dias);
     }
 
+    @GetMapping("/api/portal/vacunas/pendientes")
+    @PreAuthorize(Permisos.PROPIETARIO)
+    @Operation(summary = "Consultar las dosis pendientes de las mascotas propias")
+    @ApiResponse(responseCode = "200", description = "Dosis con estado PENDIENTE o VENCIDA")
+    public List<AlertaVacunaResponse> pendientes() {
+        return vacunaService.pendientesDelPropietario();
+    }
+
     @GetMapping("/api/portal/mascotas/{mascotaId}/carne")
     @PreAuthorize(Permisos.PROPIETARIO)
     @Operation(summary = "Consultar el carné de vacunación de una mascota propia")

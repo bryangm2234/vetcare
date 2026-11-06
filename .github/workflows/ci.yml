@@ -36,3 +36,5 @@ jobs:
       - name: Compilar y probar ${{ matrix.servicio }}
         working-directory: ${{ matrix.servicio }}
         run: sh mvnw -B verify
+      - name: Construir la imagen Docker de ${{ matrix.servicio }}
+        run: docker build -t vetcare-${{ matrix.servicio }} ${{ matrix.servicio }}

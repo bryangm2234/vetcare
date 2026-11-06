@@ -76,6 +76,7 @@ Las demás rutas exigen `Authorization: Bearer <token>`: responden 401 sin un to
 | `PATCH /api/mascotas/{id}/estado` | Recepcionista | HU-017 |
 | `POST /api/mascotas/{id}/transferencia` | Recepcionista | HU-018 |
 | `GET /api/reportes/mascotas` | Administrador | HU-019 |
+| `GET /api/portal/mascotas` | Propietario | HU-071 |
 
 ## Primer uso con PowerShell
 

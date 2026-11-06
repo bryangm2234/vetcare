@@ -43,7 +43,7 @@ public class PeluqueriaService {
 
     public List<ItemPendienteResponse> itemsPendientes() {
         return citaRepository.findByTipoAndEstadoAndFacturadoFalse(TipoCita.PELUQUERIA, EstadoCita.REALIZADA).stream()
-                .map(c -> new ItemPendienteResponse(c.getId(), "PELUQUERIA", c.getMotivo(), c.getMascotaId(), c.getFecha()))
+                .map(c -> new ItemPendienteResponse(c.getId(), "PELUQUERIA", c.getMotivo(), c.getMascotaId(), c.getFecha(), 1))
                 .toList();
     }
 }

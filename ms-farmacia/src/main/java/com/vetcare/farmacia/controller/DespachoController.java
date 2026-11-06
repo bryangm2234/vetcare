@@ -2,9 +2,11 @@ package com.vetcare.farmacia.controller;
 
 import com.vetcare.farmacia.dto.DespachoRequest;
 import com.vetcare.farmacia.dto.ItemPendienteResponse;
+import com.vetcare.farmacia.dto.MarcaFacturadoRequest;
 import com.vetcare.farmacia.model.Despacho;
 import com.vetcare.farmacia.security.Permisos;
 import com.vetcare.farmacia.service.DespachoService;
+import com.vetcare.farmacia.service.MarcadorFacturacion;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -15,6 +17,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,8 +30,10 @@ import org.springframework.web.bind.annotation.RestController;
 public class DespachoController {
 
     private final DespachoService despachoService;
+    private final MarcadorFacturacion marcador;
 
-    public DespachoController(DespachoService despachoService) {
+    public DespachoController(DespachoService despachoService, MarcadorFacturacion marcador) {
+        this.marcador = marcador;
         this.despachoService = despachoService;
     }
 
@@ -51,5 +56,14 @@ public class DespachoController {
     @ApiResponse(responseCode = "200", description = "Ítems pendientes con su valor")
     public List<ItemPendienteResponse> itemsPendientes() {
         return despachoService.itemsPendientes();
+    }
+
+    @PatchMapping("/items-facturados")
+    @PreAuthorize(Permisos.CAJERO)
+    @Operation(summary = "Marcar o liberar ítems facturados; lo invoca ms-facturacion")
+    @ApiResponse(responseCode = "200", description = "Ítems actualizados")
+    @ApiResponse(responseCode = "409", description = "Un ítem no existe o ya cambió de estado; no se aplica ningún cambio")
+    public void marcarFacturados(@Valid @RequestBody MarcaFacturadoRequest solicitud) {
+        marcador.marcar(Despacho.class, solicitud.ids(), solicitud.facturado());
     }
 }

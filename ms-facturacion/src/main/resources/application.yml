@@ -25,3 +25,13 @@ springdoc:
 vetcare:
   jwt:
     public-key: ${JWT_PUBLIC_KEY:}
+  servicios:
+    pacientes-url: ${PACIENTES_URL:http://localhost:8081}
+    agenda-url: ${AGENDA_URL:http://localhost:8082}
+    historia-url: ${HISTORIA_URL:http://localhost:8083}
+    farmacia-url: ${FARMACIA_URL:http://localhost:8084}
+    timeout-segundos: 10
+  facturacion:
+    tasa-impuesto: ${VETCARE_TASA_IMPUESTO:19}
+  correo:
+    remitente: ${VETCARE_CORREO_REMITENTE:}

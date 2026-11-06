@@ -7,4 +7,6 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 public interface DespachoRepository extends MongoRepository<Despacho, String> {
 
     List<Despacho> findByFacturadoFalse();
+
+    List<Despacho> findByFechaBetween(java.time.Instant desde, java.time.Instant hasta);
 }

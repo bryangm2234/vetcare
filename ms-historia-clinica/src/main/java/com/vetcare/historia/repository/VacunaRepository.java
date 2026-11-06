@@ -12,4 +12,6 @@ public interface VacunaRepository extends MongoRepository<Vacuna, String> {
     List<Vacuna> findByMascotaIdOrderByFechaDesc(String mascotaId);
 
     List<Vacuna> findByVigenteTrueAndProximaDosisLessThanEqualOrderByProximaDosis(LocalDate limite);
+
+    List<Vacuna> findByMascotaIdInAndVigenteTrueAndProximaDosisNotNullOrderByProximaDosis(List<String> mascotas);
 }

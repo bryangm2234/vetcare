@@ -72,7 +72,7 @@ public class LaboratorioService {
     public List<ItemPendienteResponse> itemsPendientes() {
         return ordenRepository.findByEstadoAndFacturadoFalse(EstadoOrdenLaboratorio.COMPLETADA).stream()
                 .map(o -> new ItemPendienteResponse(o.getId(), "LABORATORIO", "Examen: " + o.getExamen(), o.getMascotaId(),
-                        o.getFechaResultado().atZone(ZoneId.systemDefault()).toLocalDate()))
+                        o.getFechaResultado().atZone(ZoneId.systemDefault()).toLocalDate(), 1))
                 .toList();
     }
 }
