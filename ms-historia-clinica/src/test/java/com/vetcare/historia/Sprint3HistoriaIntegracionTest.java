@@ -368,4 +368,51 @@ class Sprint3HistoriaIntegracionTest {
         enviar(get("/api/consultas/abiertas"), "VETERINARIO", null).andExpect(jsonPath("$", hasSize(0)));
         enviar(get("/api/consultas/abiertas"), "CAJERO", null).andExpect(status().isForbidden());
     }
+
+    @Test
+    void hu042_sinOrdenesPendientes() throws Exception {
+        enviar(get("/api/ordenes-laboratorio"), "LABORATORIO", null)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.contenido", hasSize(0)));
+    }
+
+    private String marca(String id, boolean facturado) {
+        return """
+                {"ids":["%s"],"facturado":%s}""".formatted(id, facturado);
+    }
+
+    @Test
+    void hu061_hu065_marcaDeItemsFacturados() throws Exception {
+        String consulta = consulta();
+        String orden = id(enviar(post("/api/consultas/" + consulta + "/ordenes-laboratorio"), "VETERINARIO", """
+                {"examen":"Hemograma"}"""));
+        enviar(put("/api/ordenes-laboratorio/" + orden + "/resultado"), "LABORATORIO", """
+                {"resultado":"Normal"}""").andExpect(status().isOk());
+        cerrar(consulta);
+        String hospital = hospitalizar("m1", "C-01");
+        enviar(patch("/api/hospitalizaciones/" + hospital + "/alta"), "VETERINARIO", """
+                {"indicaciones":"Control"}""").andExpect(status().isOk());
+
+        String[][] casos = {{"/api/consultas", consulta}, {"/api/ordenes-laboratorio", orden}, {"/api/hospitalizaciones", hospital}};
+        for (String[] caso : casos) {
+            enviar(get(caso[0] + "/items-pendientes"), "CAJERO", null).andExpect(jsonPath("$", hasSize(1))).andExpect(jsonPath("$[0].cantidad").isNumber());
+            enviar(patch(caso[0] + "/items-facturados"), "VETERINARIO", marca(caso[1], true)).andExpect(status().isForbidden());
+            enviar(patch(caso[0] + "/items-facturados"), "CAJERO", marca(caso[1], true)).andExpect(status().isOk());
+            enviar(get(caso[0] + "/items-pendientes"), "CAJERO", null).andExpect(jsonPath("$", hasSize(0)));
+            enviar(patch(caso[0] + "/items-facturados"), "CAJERO", marca(caso[1], true)).andExpect(status().isConflict());
+            enviar(patch(caso[0] + "/items-facturados"), "CAJERO", marca(caso[1], false)).andExpect(status().isOk());
+            enviar(get(caso[0] + "/items-pendientes"), "CAJERO", null).andExpect(jsonPath("$", hasSize(1)));
+        }
+    }
+
+    @Test
+    void hu061_siUnItemNoSePuedeMarcarNoQuedaNingunoMarcado() throws Exception {
+        String consulta = consulta();
+        cerrar(consulta);
+
+        enviar(patch("/api/consultas/items-facturados"), "CAJERO", """
+                {"ids":["%s","no-existe"],"facturado":true}""".formatted(consulta)).andExpect(status().isConflict());
+
+        enviar(get("/api/consultas/items-pendientes"), "CAJERO", null).andExpect(jsonPath("$", hasSize(1)));
+    }
 }

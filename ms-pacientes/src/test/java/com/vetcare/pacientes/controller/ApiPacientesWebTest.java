@@ -186,4 +186,12 @@ class ApiPacientesWebTest {
                 .andExpect(jsonPath("$.components.schemas.MascotaRequest.properties.especie.example").value("Canino"))
                 .andExpect(jsonPath("$.components.securitySchemes.bearerAuth.scheme").value("bearer"));
     }
+
+    @Test
+    void hu014_correoInvalidoResponde400ConElCampo() throws Exception {
+        mockMvc.perform(json(conRol(patch("/api/propietarios/p1/contacto"), "RECEPCIONISTA"), """
+                        {"telefono":"300","correo":"no-es-correo","direccion":"Calle 10"}"""))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.detalles.correo").isNotEmpty());
+    }
 }

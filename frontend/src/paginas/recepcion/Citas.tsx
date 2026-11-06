@@ -7,7 +7,7 @@ import { useDatos } from '../../componentes/ganchos';
 import { Tabla } from '../../componentes/Tabla';
 import { Boton, CampoFiltro, Encabezado, Estado } from '../../componentes/ui';
 import { hora, hoy } from '../../util';
-import { campoFranja, opcionesVeterinarios } from './citaCampos';
+import { campoFranja, franjasLibres, opcionesVeterinarios } from './citaCampos';
 
 export function Citas() {
   const { rol } = useUsuario();
@@ -33,8 +33,11 @@ export function Citas() {
 
   const reprogramar = (c: any) => abrir({
     titulo: `Reprogramar cita de ${c.mascotaNombre}`, exito: 'Cita reprogramada', textoEnviar: 'Reprogramar', despues: citas.recargar,
-    inicial: { fecha: c.fecha, veterinarioId: c.recursoId },
-    campos: [{ nombre: 'fecha', etiqueta: 'Fecha', tipo: 'date', requerido: true }, campoFranja],
+    inicial: { fecha: c.fecha },
+    campos: [
+      { nombre: 'fecha', etiqueta: 'Fecha', tipo: 'date', requerido: true },
+      { ...campoFranja, dependeDe: ['fecha'], opcionesDe: (v) => franjasLibres({ ...v, veterinarioId: c.recursoId }) },
+    ],
     enviar: (v) => api('agenda', `/api/citas/${c.id}/reprogramacion`, 'PUT', { fecha: v.fecha, hora: v.hora }),
   });
 

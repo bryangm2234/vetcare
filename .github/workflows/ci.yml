@@ -54,3 +54,18 @@ jobs:
       - run: npm ci
       - run: npm test
       - run: npm run build
+
+  secretos:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Buscar credenciales en el repositorio
+        run: |
+          if git grep -nE 'mongodb\+srv://[^/:@ ]+:[^@ ]+@|BEGIN (RSA |EC )?PRIVATE KEY|ghp_[A-Za-z0-9]{20}' -- . ':!.github'; then
+            echo "::error::Se encontraron posibles credenciales en el repositorio"
+            exit 1
+          fi
+          if git ls-files | grep -E '(^|/)\.env$|\.pem$|\.local\.md$'; then
+            echo "::error::Hay archivos de credenciales versionados"
+            exit 1
+          fi
