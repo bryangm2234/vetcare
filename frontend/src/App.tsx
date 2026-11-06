@@ -3,6 +3,7 @@ import { useSesion } from './auth/sesion';
 import { MENU } from './auth/roles';
 import { Plantilla } from './componentes/Plantilla';
 import { Encabezado } from './componentes/ui';
+import { Inicio } from './paginas/Inicio';
 import { Login } from './paginas/Login';
 import { Panel } from './paginas/Panel';
 import { Cuenta } from './paginas/Cuenta';
@@ -43,17 +44,21 @@ function Solo({ ruta, children }: { ruta: string; children: ReactElement }) {
 }
 
 export function App() {
-  const { sesion } = useSesion();
+  const { sesion, aviso } = useSesion();
   if (!sesion) {
     return (
       <Routes>
-        <Route path="*" element={<Login />} />
+        {/* Una sesión expirada lleva directo al acceso, donde se explica el motivo. */}
+        <Route index element={aviso ? <Navigate to="/login" replace /> : <Inicio />} />
+        <Route path="login" element={<Login />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     );
   }
   const pagina = (ruta: string, elemento: ReactElement) => <Route path={ruta} element={<Solo ruta={ruta}>{elemento}</Solo>} />;
   return (
     <Routes>
+      <Route path="login" element={<Navigate to="/" replace />} />
       <Route element={<Plantilla />}>
         <Route index element={<Panel />} />
         <Route path="cuenta" element={<Cuenta />} />

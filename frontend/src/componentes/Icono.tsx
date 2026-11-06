@@ -22,6 +22,7 @@ const TRAZOS: Record<string, string> = {
   check: 'M4 12l5 5L20 6',
   menu: 'M3 6h18M3 12h18M3 18h18',
   salir: 'M9 21H4V3h5M16 17l5-5-5-5M21 12H9',
+  regresar: 'M19 12H5M11 18l-6-6 6-6',
   mas: 'M12 5v14M5 12h14',
   buscar: 'M11 19a8 8 0 1 0 0-16 8 8 0 0 0 0 16M21 21l-4.300-4.300',
   cuenta: 'M12 12a5 5 0 1 0 0-10 5 5 0 0 0 0 10M4 22a8 8 0 0 1 16 0',

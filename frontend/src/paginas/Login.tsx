@@ -1,9 +1,11 @@
 import { useState, type FormEvent } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useSesion } from '../auth/sesion';
-import { Marca } from '../componentes/Icono';
+import { Icono, Marca } from '../componentes/Icono';
 
 export function Login() {
-  const { iniciar, aviso } = useSesion();
+  const { iniciar, aviso, cerrar } = useSesion();
+  const navegar = useNavigate();
   const [correo, setCorreo] = useState('');
   const [contrasena, setContrasena] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -33,6 +35,11 @@ export function Login() {
       </section>
       <main className="acceso-formulario">
         <form onSubmit={enviar}>
+          {/* cerrar() limpia el aviso de sesión expirada, que de otro modo devolvería al acceso. */}
+          <button type="button" className="boton boton-suave acceso-regresar" onClick={() => { cerrar(); navegar('/'); }}>
+            <Icono nombre="regresar" />
+            Regresar
+          </button>
           <div>
             <h2>Iniciar sesión</h2>
             <p>Ingresa con tu correo y contraseña.</p>
