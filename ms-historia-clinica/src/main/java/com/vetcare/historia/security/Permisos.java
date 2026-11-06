@@ -9,8 +9,11 @@ public final class Permisos {
     public static final String AUXILIAR = "hasRole('AUXILIAR_VETERINARIO')";
     public static final String RECEPCIONISTA = "hasRole('RECEPCIONISTA')";
     public static final String PROPIETARIO = "hasRole('PROPIETARIO')";
+    public static final String LABORATORIO = "hasRole('LABORATORIO')";
+    public static final String FARMACIA = "hasRole('FARMACIA')";
     public static final String CAJERO = "hasAnyRole('CAJERO','ADMINISTRADOR')";
     public static final String CONSULTA_ESQUEMAS = "hasAnyRole('VETERINARIO','RECEPCIONISTA','AUXILIAR_VETERINARIO')";
+    public static final String CONSULTA_VIGENCIA = "hasAnyRole('FARMACIA','VETERINARIO')";
 
     private Permisos() {
     }

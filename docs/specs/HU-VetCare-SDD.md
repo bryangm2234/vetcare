@@ -47,7 +47,7 @@ Las rutas `/api/portal/...` y `/api/proveedor/...` filtran por el `propietarioId
 | D8 | El veterinario puede anular una fórmula con motivo, dentro de HU-045. |
 | D9 | Los ajustes de inventario, con motivo y auditoría, se incluyen en HU-055. |
 | D10 | La fórmula admite varios ítems con cantidad pendiente propia. Estados: `VIGENTE`, `PARCIAL`, `DESPACHADA`, `VENCIDA` y `ANULADA`. |
-| D11 | Una vacuna aplicada descuenta su lote en `ms-farmacia`. En hospitalización solo se administra lo ya formulado y despachado. Hasta el Sprint 3, sin `FARMACIA_URL`, la dosis queda marcada con inventario sin descontar. |
+| D11 | Una vacuna aplicada descuenta su lote en `ms-farmacia`. En hospitalización solo se administra lo ya formulado y despachado. |
 | D12 | Correo por SMTP con credenciales en variables de entorno. HU-030 se dispara con una ejecución diaria externa, como GitHub Actions, autenticada con la clave `VETCARE_CLAVE_PROCESO`. |
 | D13 | Adjuntos en GridFS sobre Atlas: PDF e imágenes de hasta 5 MB. |
 | D14 | Plan gratuito de Render en desarrollo, con reintentos entre servicios. Valorar un plan de pago para la entrega. |
@@ -1230,7 +1230,7 @@ Como veterinario, quiero registrar la vacuna aplicada con lote y fecha, para que
 |---|---|
 | Sprint · Prioridad · Puntos | Sprint 2 · Alta · 16 |
 | Microservicio | ms-historia-clinica |
-| Endpoint | `POST /api/vacunas` |
+| Endpoint | `POST /api/vacunas · POST /api/lotes/{numero}/consumos (ms-farmacia)` |
 | Reglas de negocio | RN-01, RN-04 (por D11) |
 | Desarrolla · Prueba · Verifica | Alejandro Gonzalez · Gabriel Ramirez · Bryan Garcia |
 | Criterio principal | Al registrar una dosis con lote y fecha se calcula la próxima según el esquema y se descuenta del lote en ms-farmacia (D11). |
@@ -1258,10 +1258,10 @@ Característica: HU-037 registrar la vacuna aplicada con lote y fecha
     Dado que la mascota ya recibió todas las dosis del esquema
     Cuando intento registrar otra dosis
     Entonces el sistema responde 422
-  Escenario: Farmacia sin configurar
-    Dado que FARMACIA_URL no está configurada mientras ms-farmacia no se implementa (Sprint 3)
-    Cuando registro la dosis
-    Entonces la dosis se guarda marcada con inventario sin descontar
+  Escenario: Lote inexistente
+    Dado que el lote no existe en ms-farmacia
+    Cuando intento registrar la dosis
+    Entonces el sistema responde 404 y no registra la dosis
   Escenario: Fecha futura
     Dado que la fecha de aplicación es futura
     Cuando intento registrar la dosis
@@ -1692,7 +1692,7 @@ Como personal de farmacia, quiero registrar medicamentos e insumos con código, 
 |---|---|
 | Sprint · Prioridad · Puntos | Sprint 3 · Alta · 16 |
 | Microservicio | ms-farmacia |
-| Endpoint | `POST /api/medicamentos · GET /api/medicamentos?texto=&page=&size=` |
+| Endpoint | `POST /api/medicamentos · GET /api/medicamentos?texto=&page=&size= · GET /api/medicamentos/{id}` |
 | Reglas de negocio | RN-04 |
 | Desarrolla · Prueba · Verifica | Alejandro Gonzalez · Gabriel Ramirez · Bryan Garcia |
 | Criterio principal | Se registran medicamentos e insumos con código único, presentación, precio y stock mínimo. |
@@ -1756,7 +1756,7 @@ Como personal de farmacia, quiero despachar los medicamentos de una fórmula, pa
 |---|---|
 | Sprint · Prioridad · Puntos | Sprint 3 · Alta · 24 |
 | Microservicio | ms-farmacia |
-| Endpoint | `POST /api/despachos` |
+| Endpoint | `POST /api/despachos · GET /api/despachos/items-pendientes · PATCH /api/formulas/{id}/despachos (ms-historia-clinica)` |
 | Reglas de negocio | RN-02, RN-04 |
 | Desarrolla · Prueba · Verifica | Alejandro Gonzalez · Gabriel Ramirez · Bryan Garcia |
 | Criterio principal | Rechaza el despacho sin fórmula vigente o por más de lo formulado y descuenta stock del lote que vence primero. |

@@ -44,6 +44,23 @@ public final class TokensPrueba {
         return firmar(CLAVES, "PROPIETARIO", propietarioId, Instant.now().plus(Duration.ofMinutes(30)));
     }
 
+    public static String tokenDeProveedor(String proveedorId) {
+        RSAKey jwk = new RSAKey.Builder((RSAPublicKey) CLAVES.getPublic())
+                .privateKey((RSAPrivateKey) CLAVES.getPrivate())
+                .build();
+        NimbusJwtEncoder encoder = new NimbusJwtEncoder(new ImmutableJWKSet<>(new JWKSet(jwk)));
+        Instant ahora = Instant.now();
+        JwtClaimsSet claims = JwtClaimsSet.builder()
+                .subject("proveedor-prueba")
+                .claim("correo", "proveedor@vetcare.test")
+                .claim("rol", "PROVEEDOR")
+                .claim("proveedorId", proveedorId)
+                .issuedAt(ahora)
+                .expiresAt(ahora.plus(Duration.ofMinutes(30)))
+                .build();
+        return encoder.encode(JwtEncoderParameters.from(JwsHeader.with(SignatureAlgorithm.RS256).build(), claims)).getTokenValue();
+    }
+
     public static String tokenExpirado(String rol) {
         return firmar(CLAVES, rol, null, Instant.now().minus(Duration.ofHours(1)));
     }

@@ -18,7 +18,6 @@ public class Vacuna {
     private LocalDate fecha;
     private LocalDate proximaDosis;
     private boolean vigente = true;
-    private boolean inventarioDescontado;
     private String veterinarioId;
 
     public String getId() {
@@ -99,14 +98,6 @@ public class Vacuna {
 
     public void setVigente(boolean vigente) {
         this.vigente = vigente;
-    }
-
-    public boolean isInventarioDescontado() {
-        return inventarioDescontado;
-    }
-
-    public void setInventarioDescontado(boolean inventarioDescontado) {
-        this.inventarioDescontado = inventarioDescontado;
     }
 
     public String getVeterinarioId() {

@@ -32,5 +32,5 @@ vetcare:
   servicios:
     pacientes-url: ${PACIENTES_URL:http://localhost:8081}
     agenda-url: ${AGENDA_URL:http://localhost:8082}
-    farmacia-url: ${FARMACIA_URL:}
+    farmacia-url: ${FARMACIA_URL:http://localhost:8084}
     timeout-segundos: 10

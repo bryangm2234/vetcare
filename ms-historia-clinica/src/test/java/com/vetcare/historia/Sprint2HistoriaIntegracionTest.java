@@ -68,6 +68,8 @@ class Sprint2HistoriaIntegracionTest {
     private AgendaClient agendaClient;
     @MockitoBean
     private PacientesClient pacientesClient;
+    @MockitoBean
+    private com.vetcare.historia.client.FarmaciaClient farmaciaClient;
 
     @DynamicPropertySource
     static void propiedades(DynamicPropertyRegistry registro) {
@@ -235,8 +237,8 @@ class Sprint2HistoriaIntegracionTest {
         vacunar(fecha)
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.dosis").value(1))
-                .andExpect(jsonPath("$.proximaDosis").value(fecha.plusDays(365).toString()))
-                .andExpect(jsonPath("$.inventarioDescontado").value(false));
+                .andExpect(jsonPath("$.proximaDosis").value(fecha.plusDays(365).toString()));
+        verify(farmaciaClient).descontarVacuna("L-100");
         vacunar(LocalDate.now())
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.dosis").value(2))

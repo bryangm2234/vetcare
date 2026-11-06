@@ -25,3 +25,6 @@ springdoc:
 vetcare:
   jwt:
     public-key: ${JWT_PUBLIC_KEY:}
+  servicios:
+    historia-url: ${HISTORIA_URL:http://localhost:8083}
+    timeout-segundos: 10
