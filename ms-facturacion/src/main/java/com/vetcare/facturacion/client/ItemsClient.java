@@ -55,7 +55,7 @@ public class ItemsClient {
     /** Marca o desmarca por servicio; si uno falla, deshace los ya aplicados. */
     public void marcar(List<ItemFactura> items, boolean facturado) {
         Map<TipoServicio, List<String>> porTipo = items.stream()
-                .collect(Collectors.groupingBy(ItemFactura::tipo, Collectors.mapping(ItemFactura::origenId, Collectors.toList())));
+                .collect(Collectors.groupingBy(ItemFactura::tipo, () -> new EnumMap<>(TipoServicio.class), Collectors.mapping(ItemFactura::origenId, Collectors.toList())));
         List<Map.Entry<TipoServicio, List<String>>> aplicados = new ArrayList<>();
         try {
             for (Map.Entry<TipoServicio, List<String>> grupo : porTipo.entrySet()) {

@@ -422,4 +422,31 @@ class Sprint3FarmaciaIntegracionTest {
         enviar(get("/api/medicamentos/no-existe/lotes"), "FARMACIA", null).andExpect(status().isNotFound());
         enviar(get("/api/medicamentos/" + med + "/lotes"), "CAJERO", null).andExpect(status().isForbidden());
     }
+
+    @Test
+    void hu061_marcaDeDespachosYHu072Ventas() throws Exception {
+        String med = medicamento("MED-1", 0);
+        lote(med, "A", VENCE, 20);
+        formula(med, "VIGENTE", true, 14);
+        String despacho = id(despachar(med, 4).andExpect(status().isCreated()));
+        LocalDate hoy = LocalDate.now();
+        String periodo = "?desde=" + hoy + "&hasta=" + hoy;
+
+        enviar(get("/api/reportes/ventas-farmacia" + periodo), "ADMINISTRADOR", null)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.despachos").value(1))
+                .andExpect(jsonPath("$.unidades").value(4))
+                .andExpect(jsonPath("$.valor").value(6000));
+        enviar(get("/api/reportes/ventas-farmacia?desde=" + hoy.plusDays(1) + "&hasta=" + hoy), "ADMINISTRADOR", null).andExpect(status().isBadRequest());
+        enviar(get("/api/reportes/ventas-farmacia" + periodo), "CAJERO", null).andExpect(status().isForbidden());
+
+        String marca = """
+                {"ids":["%s"],"facturado":%s}""";
+        enviar(patch("/api/despachos/items-facturados"), "FARMACIA", marca.formatted(despacho, true)).andExpect(status().isForbidden());
+        enviar(patch("/api/despachos/items-facturados"), "CAJERO", marca.formatted(despacho, true)).andExpect(status().isOk());
+        enviar(get("/api/despachos/items-pendientes"), "CAJERO", null).andExpect(jsonPath("$", hasSize(0)));
+        enviar(patch("/api/despachos/items-facturados"), "CAJERO", marca.formatted(despacho, true)).andExpect(status().isConflict());
+        enviar(patch("/api/despachos/items-facturados"), "CAJERO", marca.formatted(despacho, false)).andExpect(status().isOk());
+        enviar(get("/api/despachos/items-pendientes"), "CAJERO", null).andExpect(jsonPath("$", hasSize(1)));
+    }
 }

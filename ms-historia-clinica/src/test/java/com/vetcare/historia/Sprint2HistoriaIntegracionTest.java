@@ -326,4 +326,34 @@ class Sprint2HistoriaIntegracionTest {
         adjuntar(new MockMultipartFile("archivo", "virus.exe", "application/octet-stream", contenido))
                 .andExpect(status().isUnsupportedMediaType());
     }
+
+    @Test
+    void hu037_loteInexistenteOSinStockNoRegistraLaDosis() throws Exception {
+        esquemaRabia(2);
+        doThrow(new com.vetcare.historia.exception.RecursoNoEncontradoException("El lote no existe")).when(farmaciaClient).descontarVacuna("L-100");
+        vacunar(LocalDate.now()).andExpect(status().isNotFound()).andExpect(jsonPath("$.mensaje").value("El lote no existe"));
+
+        org.mockito.Mockito.reset(farmaciaClient);
+        doThrow(new com.vetcare.historia.exception.ConflictoException("Stock insuficiente")).when(farmaciaClient).descontarVacuna("L-100");
+        vacunar(LocalDate.now()).andExpect(status().isConflict()).andExpect(jsonPath("$.mensaje").value("Stock insuficiente"));
+
+        enviar(get("/api/historias/m1"), "VETERINARIO", null).andExpect(jsonPath("$.vacunas", hasSize(0)));
+    }
+
+    @Test
+    void hu071_vacunasPendientesDelPropietario() throws Exception {
+        esquemaRabia(2);
+        vacunar(LocalDate.now()).andExpect(status().isCreated());
+        when(pacientesClient.mascotasPropias()).thenReturn(new MascotaInfo[] {new MascotaInfo("m1", "Max", "Canino", "p1", List.of(), List.of())});
+
+        enviar(get("/api/portal/vacunas/pendientes"), "PROPIETARIO", null)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(1)))
+                .andExpect(jsonPath("$[0].vacuna").value("Rabia"))
+                .andExpect(jsonPath("$[0].estado").value("PENDIENTE"));
+
+        when(pacientesClient.mascotasPropias()).thenReturn(new MascotaInfo[0]);
+        enviar(get("/api/portal/vacunas/pendientes"), "PROPIETARIO", null).andExpect(jsonPath("$", hasSize(0)));
+        enviar(get("/api/portal/vacunas/pendientes"), "RECEPCIONISTA", null).andExpect(status().isForbidden());
+    }
 }

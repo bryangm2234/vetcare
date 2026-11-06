@@ -21,7 +21,7 @@ import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
-@SpringBootTest(properties = "spring.mongodb.uri=mongodb://localhost:27017/?serverSelectionTimeoutMS=200")
+@SpringBootTest(properties = "spring.mongodb.uri=mongodb://127.0.0.1:1/?serverSelectionTimeoutMS=200")
 @AutoConfigureMockMvc
 class PacientesApplicationTests {
 
@@ -44,27 +44,26 @@ class PacientesApplicationTests {
     }
 
     @Test
-    void usaSuPropiaBaseDeDatos() {
+    void hu008_usaSuPropiaBaseDeDatos() {
         assertThat(mongoTemplate.getDb().getName()).isEqualTo("vetcare_pacientes");
     }
 
     @Test
-    void laSaludEsPublica() throws Exception {
-        int estado = mockMvc.perform(get("/actuator/health")).andReturn().getResponse().getStatus();
-
-        // Responde 503 cuando MongoDB no está disponible, como ocurre en esta prueba.
-        assertThat(estado).isIn(200, 503);
+    void hu008_sinMongoDbLaSaludEsPublicaYRespondeDown() throws Exception {
+        mockMvc.perform(get("/actuator/health"))
+                .andExpect(status().isServiceUnavailable())
+                .andExpect(jsonPath("$.status").value("DOWN"));
     }
 
     @Test
-    void laDocumentacionEsPublica() throws Exception {
+    void hu010_laDocumentacionEsPublica() throws Exception {
         mockMvc.perform(get("/v3/api-docs"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.info.title").value("VetCare - ms-pacientes"));
     }
 
     @Test
-    void sinTokenResponde401EnFormatoEstandar() throws Exception {
+    void hu003_sinTokenResponde401EnFormatoEstandar() throws Exception {
         mockMvc.perform(get(PROTEGIDO))
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.status").value(401))
@@ -73,26 +72,26 @@ class PacientesApplicationTests {
     }
 
     @Test
-    void tokenConFirmaInvalidaResponde401() throws Exception {
+    void hu003_tokenConFirmaInvalidaResponde401() throws Exception {
         mockMvc.perform(get(PROTEGIDO).header("Authorization", "Bearer " + TokensPrueba.tokenConOtraClave("ADMINISTRADOR")))
                 .andExpect(status().isUnauthorized());
     }
 
     @Test
-    void tokenExpiradoResponde401() throws Exception {
+    void hu002_tokenExpiradoResponde401() throws Exception {
         mockMvc.perform(get(PROTEGIDO).header("Authorization", "Bearer " + TokensPrueba.tokenExpirado("ADMINISTRADOR")))
                 .andExpect(status().isUnauthorized());
     }
 
     @Test
-    void rolNoAutorizadoResponde403EnFormatoEstandar() throws Exception {
+    void hu003_rolNoAutorizadoResponde403EnFormatoEstandar() throws Exception {
         mockMvc.perform(get(PROTEGIDO).header("Authorization", "Bearer " + TokensPrueba.token("CAJERO")))
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.status").value(403));
     }
 
     @Test
-    void administradorConsultaLaAuditoria() throws Exception {
+    void hu003_rolAutorizadoConsultaLaAuditoria() throws Exception {
         when(auditoriaService.consultar(any(), any(), any(), any(), any(Integer.class), any(Integer.class)))
                 .thenReturn(new PaginaResponse<>(List.of(), 0, 20, 0, 0));
 
@@ -102,7 +101,7 @@ class PacientesApplicationTests {
     }
 
     @Test
-    void rutaInexistenteResponde404EnFormatoEstandar() throws Exception {
+    void hu079_rutaInexistenteResponde404EnFormatoEstandar() throws Exception {
         mockMvc.perform(get("/api/no-existe").header("Authorization", "Bearer " + TokensPrueba.token("ADMINISTRADOR")))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.status").value(404));
@@ -120,5 +119,45 @@ class PacientesApplicationTests {
                         .header("Origin", "https://otro-sitio.test")
                         .header("Access-Control-Request-Method", "GET"))
                 .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void hu079_errorInesperadoNoExponeDetallesInternos() throws Exception {
+        when(auditoriaService.consultar(any(), any(), any(), any(), any(Integer.class), any(Integer.class)))
+                .thenThrow(new IllegalStateException("detalle-interno-secreto"));
+
+        mockMvc.perform(get(PROTEGIDO).header("Authorization", "Bearer " + TokensPrueba.token("ADMINISTRADOR")))
+                .andExpect(status().isInternalServerError())
+                .andExpect(jsonPath("$.status").value(500))
+                .andExpect(jsonPath("$.mensaje").value("Ocurrió un error interno"))
+                .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.content().string(org.hamcrest.Matchers.not(org.hamcrest.Matchers.containsString("detalle-interno-secreto"))));
+    }
+
+    @Test
+    void hu079_servicioDependienteCaidoResponde503() throws Exception {
+        when(auditoriaService.consultar(any(), any(), any(), any(), any(Integer.class), any(Integer.class)))
+                .thenThrow(new com.vetcare.pacientes.exception.ServicioNoDisponibleException("El servicio ms-prueba no está disponible"));
+
+        mockMvc.perform(get(PROTEGIDO).header("Authorization", "Bearer " + TokensPrueba.token("ADMINISTRADOR")))
+                .andExpect(status().isServiceUnavailable())
+                .andExpect(jsonPath("$.status").value(503))
+                .andExpect(jsonPath("$.mensaje").value("El servicio ms-prueba no está disponible"));
+    }
+
+    @Test
+    void hu079_reglaDeNegocioResponde422() throws Exception {
+        when(auditoriaService.consultar(any(), any(), any(), any(), any(Integer.class), any(Integer.class)))
+                .thenThrow(new com.vetcare.pacientes.exception.ReglaNegocioException("Regla incumplida"));
+
+        mockMvc.perform(get(PROTEGIDO).header("Authorization", "Bearer " + TokensPrueba.token("ADMINISTRADOR")))
+                .andExpect(status().isUnprocessableContent())
+                .andExpect(jsonPath("$.mensaje").value("Regla incumplida"));
+    }
+
+    @Test
+    void hu079_parametroInvalidoResponde400() throws Exception {
+        mockMvc.perform(get(PROTEGIDO + "?desde=no-es-fecha").header("Authorization", "Bearer " + TokensPrueba.token("ADMINISTRADOR")))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(400));
     }
 }

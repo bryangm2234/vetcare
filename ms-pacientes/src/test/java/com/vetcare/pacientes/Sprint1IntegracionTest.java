@@ -378,4 +378,24 @@ class Sprint1IntegracionTest {
                 .andExpect(jsonPath("$[1].especie").value("Felino"))
                 .andExpect(jsonPath("$[1].total").value(2));
     }
+
+    @Test
+    void hu016_mascotaInexistente() throws Exception {
+        enviar(put("/api/mascotas/no-existe/antecedentes"), tokenDe("VETERINARIO"), """
+                {"alergias":[],"condicionesCronicas":[]}""").andExpect(status().isNotFound());
+    }
+
+    @Test
+    void hu071_portalMuestraSoloLasMascotasPropias() throws Exception {
+        String propio = crearPropietario("109", "María Gómez");
+        String otro = crearPropietario("110", "Luis Díaz");
+        crearMascota(propio, "Canino", "Criollo");
+        crearMascota(otro, "Felino", "Persa");
+
+        enviar(get("/api/portal/mascotas"), TokensPrueba.tokenDePropietario(propio), null)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(1)))
+                .andExpect(jsonPath("$[0].propietarioId").value(propio));
+        enviar(get("/api/portal/mascotas"), tokenDe("RECEPCIONISTA"), null).andExpect(status().isForbidden());
+    }
 }
