@@ -18,6 +18,9 @@ Consultas, signos vitales, vacunación, laboratorio, fórmulas y hospitalizació
 | `MONGODB_URI` | En la nube | `mongodb://localhost:27017` | Conexión a MongoDB, sin nombre de base de datos |
 | `PORT` | No | `8083` | Puerto HTTP. Render lo define automáticamente |
 | `JWT_PUBLIC_KEY` | Sí | Ninguno | Clave pública RSA en Base64 para validar los JWT |
+| `PACIENTES_URL` | En la nube | `http://localhost:8081` | URL de ms-pacientes |
+| `AGENDA_URL` | En la nube | `http://localhost:8082` | URL de ms-agenda |
+| `FARMACIA_URL` | Desde el Sprint 3 | Ninguno | URL de ms-farmacia. Sin ella, la vacuna queda con inventario sin descontar |
 
 ## Ejecutar en PowerShell
 
@@ -47,6 +50,36 @@ Las pruebas unitarias no necesitan MongoDB. Las de integración solo corren si d
 | `GET /api/auditoria` | Administrador | Auditoría del servicio (HU-009) |
 
 Las demás rutas exigen `Authorization: Bearer <token>`: responden 401 sin un token válido y 403 si el rol no está autorizado (HU-003). Los errores siguen el formato estándar de HU-079.
+
+### Consultas y vacunación
+
+| Ruta | Rol | Historia |
+|---|---|---|
+| `POST /api/consultas` | Veterinario | HU-031 |
+| `GET /api/consultas/{id}` | Veterinario | HU-031 |
+| `PUT /api/citas/{citaId}/signos-vitales` | Auxiliar veterinario | HU-032 |
+| `PUT /api/consultas/{id}/registro-clinico` | Veterinario | HU-033 |
+| `GET /api/historias/{mascotaId}` | Veterinario | HU-034 |
+| `PATCH /api/consultas/{id}/cierre` | Veterinario | HU-035 |
+| `GET /api/consultas/items-pendientes` | Cajero, administrador | HU-035 |
+| `POST /api/esquemas-vacunacion` | Veterinario | HU-036 |
+| `GET /api/esquemas-vacunacion?especie=` | Veterinario, recepcionista, auxiliar | HU-036 |
+| `POST /api/vacunas` | Veterinario | HU-037 |
+| `GET /api/vacunas/alertas?dias=30` | Recepcionista | HU-038 |
+| `GET /api/portal/mascotas/{mascotaId}/carne` | Propietario | HU-039 |
+| `POST /api/historias/{mascotaId}/adjuntos` | Veterinario | HU-040 |
+| `GET /api/adjuntos/{id}` | Veterinario | HU-040 |
+
+Este servicio necesita ms-pacientes y ms-agenda en ejecución. Laboratorio, fórmulas y hospitalización llegan en el Sprint 3.
+
+## Errores comunes
+
+| Síntoma | Causa | Solución |
+|---|---|---|
+| 503 al abrir o cerrar una consulta | ms-agenda no responde | Arráncalo o revisa `AGENDA_URL` |
+| 422 "La cita no está en espera" | Falta registrar la llegada | Usa `PATCH /api/citas/{id}/llegada` en ms-agenda |
+| 422 al registrar una vacuna | La vacuna no tiene esquema para la especie | Créalo con `POST /api/esquemas-vacunacion` |
+| 413 al adjuntar | El archivo supera los 5 MB | Reduce el archivo |
 
 Ejemplo de respuesta de `/actuator/health`:
 

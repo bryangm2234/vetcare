@@ -1,4 +1,8 @@
 spring:
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 6MB
   config:
     import: optional:file:../.env[.properties]
   application:
@@ -25,3 +29,8 @@ springdoc:
 vetcare:
   jwt:
     public-key: ${JWT_PUBLIC_KEY:}
+  servicios:
+    pacientes-url: ${PACIENTES_URL:http://localhost:8081}
+    agenda-url: ${AGENDA_URL:http://localhost:8082}
+    farmacia-url: ${FARMACIA_URL:}
+    timeout-segundos: 10

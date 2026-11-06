@@ -25,3 +25,9 @@ springdoc:
 vetcare:
   jwt:
     public-key: ${JWT_PUBLIC_KEY:}
+  servicios:
+    pacientes-url: ${PACIENTES_URL:http://localhost:8081}
+    timeout-segundos: 10
+  clave-proceso: ${VETCARE_CLAVE_PROCESO:}
+  correo:
+    remitente: ${VETCARE_CORREO_REMITENTE:}
