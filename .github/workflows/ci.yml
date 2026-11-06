@@ -8,6 +8,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      MONGODB_TEST_URI: mongodb://127.0.0.1:27017/?serverSelectionTimeoutMS=5000
     strategy:
       fail-fast: false
       matrix:
@@ -20,6 +22,17 @@ jobs:
           java-version: '17'
           cache: maven
           cache-dependency-path: ${{ matrix.servicio }}/pom.xml
+      - name: Iniciar MongoDB
+        run: |
+          docker run -d --name mongodb -p 27017:27017 mongo:9.0.4
+          for intento in $(seq 1 30); do
+            if docker exec mongodb mongosh --quiet --eval 'db.runCommand({ ping: 1 }).ok' > /dev/null 2>&1; then
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "::error::MongoDB no arranco: $(docker logs --tail 15 mongodb 2>&1 | tr -s '[:space:]' ' ' | cut -c1-1500)"
+          exit 1
       - name: Compilar y probar ${{ matrix.servicio }}
         working-directory: ${{ matrix.servicio }}
         run: sh mvnw -B verify

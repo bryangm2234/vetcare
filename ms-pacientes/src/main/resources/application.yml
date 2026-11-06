@@ -1,4 +1,6 @@
 spring:
+  config:
+    import: optional:file:../.env[.properties]
   application:
     name: ms-pacientes
   autoconfigure:
@@ -19,3 +21,12 @@ management:
 springdoc:
   swagger-ui:
     path: /swagger-ui.html
+
+vetcare:
+  jwt:
+    public-key: ${JWT_PUBLIC_KEY:}
+    private-key: ${JWT_PRIVATE_KEY:}
+    expiracion-minutos: 30
+  admin:
+    correo: ${VETCARE_ADMIN_CORREO:}
+    contrasena: ${VETCARE_ADMIN_CONTRASENA:}

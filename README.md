@@ -20,7 +20,7 @@ Java 17, Spring Boot 4.1, Spring Security, Spring Data MongoDB, springdoc-openap
 
 ## Empezar
 
-Instala el JDK 17 y ejecuta en cada microservicio:
+Instala el JDK 17, crea el archivo `.env` local con `java scripts/GenerarClavesJwt.java` y ejecuta en cada microservicio:
 
 ```powershell
 .\mvnw.cmd verify
