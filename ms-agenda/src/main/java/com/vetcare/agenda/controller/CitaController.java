@@ -4,6 +4,7 @@ import com.vetcare.agenda.dto.CancelacionRequest;
 import com.vetcare.agenda.dto.CitaRequest;
 import com.vetcare.agenda.dto.CitaResponse;
 import com.vetcare.agenda.dto.ReprogramacionRequest;
+import com.vetcare.agenda.model.TipoCita;
 import com.vetcare.agenda.security.Permisos;
 import com.vetcare.agenda.service.CitaService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -49,6 +50,14 @@ public class CitaController {
     @ApiResponse(responseCode = "503", description = "ms-pacientes no está disponible")
     public CitaResponse agendar(@Valid @RequestBody CitaRequest solicitud) {
         return CitaResponse.de(citaService.agendar(solicitud));
+    }
+
+    @GetMapping
+    @PreAuthorize(Permisos.CONSULTA_CITA)
+    @Operation(summary = "Consultar las citas veterinarias de una fecha")
+    @ApiResponse(responseCode = "200", description = "Citas ordenadas por hora")
+    public List<CitaResponse> delDia(@RequestParam LocalDate fecha) {
+        return citaService.delDia(TipoCita.VETERINARIA, fecha).stream().map(CitaResponse::de).toList();
     }
 
     @GetMapping("/mi-agenda")

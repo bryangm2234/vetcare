@@ -138,6 +138,10 @@ public class CitaService {
                 mascotas, List.of(EstadoCita.PROGRAMADA, EstadoCita.EN_ESPERA), LocalDate.now());
     }
 
+    public List<Cita> delDia(TipoCita tipo, LocalDate fecha) {
+        return citaRepository.findByTipoAndFechaOrderByHora(tipo, fecha);
+    }
+
     public List<Cita> agendaDe(String veterinarioId, LocalDate fecha) {
         return citaRepository.findByRecursoIdAndFechaOrderByHora(veterinarioId, fecha);
     }

@@ -55,6 +55,7 @@ Las rutas `/api/portal/...` y `/api/proveedor/...` filtran por el `propietarioId
 | D17 | Una factura consolida todos los ítems pendientes de una mascota en los demás servicios. Medicamentos se cobran al precio guardado en el despacho; los demás, con la tarifa de su servicio y, en hospitalización, por día de estancia. |
 | D18 | Valores en pesos enteros. Impuesto calculado sobre el valor con descuento, con la tasa `VETCARE_TASA_IMPUESTO`, 19 % por defecto. |
 | D19 | Los ingresos por servicio reparten cada pago en proporción al valor de los ítems de su factura. |
+| D20 | La interfaz web usa CORS con orígenes en `VETCARE_CORS_ORIGENES` y listados de soporte que no cambian ninguna regla: citas por fecha, horarios, consultas abiertas, fórmulas despachables, hospitalizaciones activas, lotes por medicamento, facturas y caja actual. |
 | D16 | Se conservan las 80 historias, se avanza primero la prioridad Alta y la Review del Sprint 2 se mueve porque el 16 de noviembre es festivo. La entrega final es el 1 de diciembre de 2026. |
 
 **Valores por defecto:**

@@ -413,4 +413,21 @@ class Sprint4FacturacionIntegracionTest {
         String sinCorreo = factura(CUERPO);
         enviar(post("/api/facturas/" + sinCorreo + "/envio-correo"), "CAJERO", null).andExpect(status().isUnprocessableContent());
     }
+
+    @Test
+    void soporteDeInterfaz_facturasYCaja() throws Exception {
+        enviar(get("/api/cajas/actual"), "CAJERO", null).andExpect(status().isUnprocessableContent());
+        String caja = caja();
+        enviar(get("/api/cajas/actual"), "CAJERO", null).andExpect(status().isOk()).andExpect(jsonPath("$.id").value(caja));
+
+        String primera = factura(CUERPO);
+        String segunda = factura(CUERPO);
+        pagar(segunda, "EFECTIVO", 357000).andExpect(status().isOk());
+
+        enviar(get("/api/facturas"), "CAJERO", null).andExpect(jsonPath("$.totalElementos").value(2));
+        enviar(get("/api/facturas?estado=PENDIENTE"), "CAJERO", null)
+                .andExpect(jsonPath("$.contenido", hasSize(1)))
+                .andExpect(jsonPath("$.contenido[0].id").value(primera));
+        enviar(get("/api/facturas"), "RECEPCIONISTA", null).andExpect(status().isForbidden());
+    }
 }

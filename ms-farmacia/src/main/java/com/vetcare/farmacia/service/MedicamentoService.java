@@ -87,6 +87,11 @@ public class MedicamentoService {
         return LoteResponse.de(lote);
     }
 
+    public List<LoteResponse> lotesDe(String medicamentoId) {
+        buscar(medicamentoId);
+        return loteRepository.findByMedicamentoIdOrderByVencimiento(medicamentoId).stream().map(LoteResponse::de).toList();
+    }
+
     public List<AlertaStockResponse> alertasStockMinimo() {
         return medicamentoRepository.findAll(Sort.by("nombre")).stream()
                 .map(m -> new AlertaStockResponse(m.getId(), m.getCodigo(), m.getNombre(), inventarioService.stockDisponible(m.getId()), m.getStockMinimo()))

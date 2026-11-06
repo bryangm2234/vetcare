@@ -18,6 +18,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import java.time.LocalDate;
 import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -28,6 +29,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -56,6 +58,14 @@ public class PeluqueriaController {
     @ApiResponse(responseCode = "403", description = "El usuario no es administrador")
     public Horario configurar(@Valid @RequestBody HorarioRequest solicitud) {
         return horarioService.configurar(HorarioService.RECURSO_PELUQUERIA, TipoCita.PELUQUERIA, solicitud);
+    }
+
+    @GetMapping("/citas")
+    @PreAuthorize(Permisos.PELUQUERIA)
+    @Operation(summary = "Consultar los servicios de peluquería de una fecha")
+    @ApiResponse(responseCode = "200", description = "Citas ordenadas por hora")
+    public List<CitaResponse> delDia(@RequestParam LocalDate fecha) {
+        return citaService.delDia(TipoCita.PELUQUERIA, fecha).stream().map(CitaResponse::de).toList();
     }
 
     @PostMapping("/citas")

@@ -4,6 +4,7 @@ import com.vetcare.historia.client.PacientesClient;
 import com.vetcare.historia.dto.EvolucionRequest;
 import com.vetcare.historia.dto.HospitalizacionRequest;
 import com.vetcare.historia.dto.ItemPendienteResponse;
+import com.vetcare.historia.dto.MedicamentoDespachadoResponse;
 import com.vetcare.historia.exception.ConflictoException;
 import com.vetcare.historia.exception.RecursoNoEncontradoException;
 import com.vetcare.historia.exception.ReglaNegocioException;
@@ -71,6 +72,10 @@ public class HospitalizacionService {
         return hospitalizacionRepository.save(hospitalizacion);
     }
 
+    public List<MedicamentoDespachadoResponse> medicamentosDespachados(String id) {
+        return formulaService.despachadosDe(activa(id).getMascotaId());
+    }
+
     public Hospitalizacion darDeAlta(String id, String indicaciones) {
         Hospitalizacion hospitalizacion = activa(id);
         Instant ahora = Instant.now();
@@ -83,6 +88,10 @@ public class HospitalizacionService {
         Hospitalizacion guardada = hospitalizacionRepository.save(hospitalizacion);
         auditoriaService.registrar("DAR_DE_ALTA", "hospitalizaciones/" + id, "EXITOSO");
         return guardada;
+    }
+
+    public List<Hospitalizacion> activas() {
+        return hospitalizacionRepository.findByEstadoOrderByFechaIngresoDesc(EstadoHospitalizacion.ACTIVA);
     }
 
     public List<Hospitalizacion> deMascota(String mascotaId) {

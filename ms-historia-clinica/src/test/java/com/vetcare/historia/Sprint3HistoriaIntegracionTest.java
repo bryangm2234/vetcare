@@ -344,4 +344,28 @@ class Sprint3HistoriaIntegracionTest {
                 .andExpect(jsonPath("$.formulas", hasSize(1)))
                 .andExpect(jsonPath("$.hospitalizaciones", hasSize(1)));
     }
+
+    @Test
+    void soporteDeInterfaz_listados() throws Exception {
+        String consulta = consulta();
+        String formula = formula(consulta);
+        String hospitalizacion = hospitalizar("m1", "C-01");
+
+        enviar(get("/api/consultas/abiertas"), "VETERINARIO", null).andExpect(jsonPath("$[0].id").value(consulta));
+        enviar(get("/api/formulas/despachables"), "FARMACIA", null).andExpect(jsonPath("$[0].id").value(formula));
+        enviar(get("/api/hospitalizaciones/activas"), "AUXILIAR_VETERINARIO", null).andExpect(jsonPath("$[0].id").value(hospitalizacion));
+
+        enviar(get("/api/hospitalizaciones/" + hospitalizacion + "/medicamentos-despachados"), "AUXILIAR_VETERINARIO", null).andExpect(jsonPath("$", hasSize(0)));
+        registrarDespacho(formula, 14).andExpect(status().isOk());
+        enviar(get("/api/hospitalizaciones/" + hospitalizacion + "/medicamentos-despachados"), "AUXILIAR_VETERINARIO", null)
+                .andExpect(jsonPath("$[0].medicamentoId").value("med1"))
+                .andExpect(jsonPath("$[0].medicamento").value("Metronidazol 250 mg"));
+        enviar(get("/api/formulas/despachables"), "FARMACIA", null).andExpect(jsonPath("$", hasSize(0)));
+        enviar(patch("/api/hospitalizaciones/" + hospitalizacion + "/alta"), "VETERINARIO", """
+                {"indicaciones":"Control"}""").andExpect(status().isOk());
+        enviar(get("/api/hospitalizaciones/activas"), "VETERINARIO", null).andExpect(jsonPath("$", hasSize(0)));
+        cerrar(consulta);
+        enviar(get("/api/consultas/abiertas"), "VETERINARIO", null).andExpect(jsonPath("$", hasSize(0)));
+        enviar(get("/api/consultas/abiertas"), "CAJERO", null).andExpect(status().isForbidden());
+    }
 }

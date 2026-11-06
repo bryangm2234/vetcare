@@ -41,6 +41,14 @@ public class HorarioController {
         return horarioService.configurar(veterinarioId, TipoCita.VETERINARIA, solicitud);
     }
 
+    @GetMapping("/api/horarios")
+    @PreAuthorize(Permisos.CONSULTA_DISPONIBILIDAD)
+    @Operation(summary = "Consultar los horarios de los veterinarios")
+    @ApiResponse(responseCode = "200", description = "Horarios configurados")
+    public List<Horario> listar() {
+        return horarioService.veterinarios();
+    }
+
     @GetMapping("/api/disponibilidad")
     @PreAuthorize(Permisos.CONSULTA_DISPONIBILIDAD)
     @Operation(summary = "Consultar franjas libres y cupos restantes por fecha")

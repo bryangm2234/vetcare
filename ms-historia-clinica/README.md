@@ -18,6 +18,7 @@ Consultas, signos vitales, vacunación, laboratorio, fórmulas y hospitalizació
 | `MONGODB_URI` | En la nube | `mongodb://localhost:27017` | Conexión a MongoDB, sin nombre de base de datos |
 | `PORT` | No | `8083` | Puerto HTTP. Render lo define automáticamente |
 | `JWT_PUBLIC_KEY` | Sí | Ninguno | Clave pública RSA en Base64 para validar los JWT |
+| `VETCARE_CORS_ORIGENES` | En la nube | `http://localhost:5173` | Orígenes permitidos para la interfaz web, separados por coma |
 | `PACIENTES_URL` | En la nube | `http://localhost:8081` | URL de ms-pacientes |
 | `AGENDA_URL` | En la nube | `http://localhost:8082` | URL de ms-agenda |
 | `FARMACIA_URL` | En la nube | `http://localhost:8084` | URL de ms-farmacia |
@@ -57,6 +58,10 @@ Las demás rutas exigen `Authorization: Bearer <token>`: responden 401 sin un to
 |---|---|---|
 | `POST /api/consultas` | Veterinario | HU-031 |
 | `GET /api/consultas/{id}` | Veterinario | HU-031 |
+| `GET /api/consultas/abiertas` | Veterinario | D20 |
+| `GET /api/formulas/despachables` | Farmacia, veterinario | D20 |
+| `GET /api/hospitalizaciones/activas` | Veterinario, auxiliar | D20 |
+| `GET /api/hospitalizaciones/{id}/medicamentos-despachados` | Veterinario, auxiliar | D20 |
 | `PUT /api/citas/{citaId}/signos-vitales` | Auxiliar veterinario | HU-032 |
 | `PUT /api/consultas/{id}/registro-clinico` | Veterinario | HU-033 |
 | `GET /api/historias/{mascotaId}` | Veterinario | HU-034 |

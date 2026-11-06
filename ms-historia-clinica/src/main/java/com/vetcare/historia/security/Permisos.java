@@ -13,6 +13,7 @@ public final class Permisos {
     public static final String FARMACIA = "hasRole('FARMACIA')";
     public static final String CAJERO = "hasAnyRole('CAJERO','ADMINISTRADOR')";
     public static final String CONSULTA_ESQUEMAS = "hasAnyRole('VETERINARIO','RECEPCIONISTA','AUXILIAR_VETERINARIO')";
+    public static final String ATENCION_HOSPITALARIA = "hasAnyRole('VETERINARIO','AUXILIAR_VETERINARIO')";
     public static final String CONSULTA_VIGENCIA = "hasAnyRole('FARMACIA','VETERINARIO')";
 
     private Permisos() {

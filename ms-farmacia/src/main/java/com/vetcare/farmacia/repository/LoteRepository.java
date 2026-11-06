@@ -11,6 +11,8 @@ public interface LoteRepository extends MongoRepository<Lote, String> {
 
     List<Lote> findByNumero(String numero);
 
+    List<Lote> findByMedicamentoIdOrderByVencimiento(String medicamentoId);
+
     /** Lotes con stock que aún no vencen, primero el que vence antes (FEFO). */
     List<Lote> findByMedicamentoIdAndCantidadGreaterThanAndVencimientoGreaterThanEqualOrderByVencimiento(
             String medicamentoId, int cantidad, LocalDate desde);

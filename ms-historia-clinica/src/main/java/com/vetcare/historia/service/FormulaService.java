@@ -5,6 +5,7 @@ import com.vetcare.historia.dto.FormulaRequest;
 import com.vetcare.historia.dto.FormulaResponse;
 import com.vetcare.historia.dto.ItemDespachadoRequest;
 import com.vetcare.historia.dto.ItemFormulaRequest;
+import com.vetcare.historia.dto.MedicamentoDespachadoResponse;
 import com.vetcare.historia.dto.VigenciaResponse;
 import com.vetcare.historia.exception.ConflictoException;
 import com.vetcare.historia.exception.DatosInvalidosException;
@@ -99,6 +100,13 @@ public class FormulaService {
         return respuesta(guardar(formula));
     }
 
+    public List<FormulaResponse> despachables() {
+        return formulaRepository.findByEstadoInOrderByFechaDesc(List.of(EstadoFormula.VIGENTE, EstadoFormula.PARCIAL)).stream()
+                .filter(f -> despachable(estadoEfectivo(f)))
+                .map(this::respuesta)
+                .toList();
+    }
+
     public List<FormulaResponse> deMascota(String mascotaId) {
         return formulaRepository.findByMascotaIdOrderByFechaDesc(mascotaId).stream().map(this::respuesta).toList();
     }
@@ -108,6 +116,15 @@ public class FormulaService {
         return formulaRepository.findByMascotaIdOrderByFechaDesc(mascotaId).stream()
                 .flatMap(f -> f.getItems().stream())
                 .anyMatch(i -> i.getMedicamentoId().equals(medicamentoId) && i.getPendiente() < i.getCantidad());
+    }
+
+    public List<MedicamentoDespachadoResponse> despachadosDe(String mascotaId) {
+        return formulaRepository.findByMascotaIdOrderByFechaDesc(mascotaId).stream()
+                .flatMap(f -> f.getItems().stream())
+                .filter(i -> i.getPendiente() < i.getCantidad())
+                .map(i -> new MedicamentoDespachadoResponse(i.getMedicamentoId(), i.getMedicamento()))
+                .distinct()
+                .toList();
     }
 
     static EstadoFormula estadoEfectivo(Formula formula, LocalDate hoy) {

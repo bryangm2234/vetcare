@@ -107,4 +107,18 @@ class PacientesApplicationTests {
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.status").value(404));
     }
+
+    @Test
+    void corsPermiteLaInterfazYRechazaOtrosOrigenes() throws Exception {
+        mockMvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.options(PROTEGIDO)
+                        .header("Origin", "http://localhost:5173")
+                        .header("Access-Control-Request-Method", "GET")
+                        .header("Access-Control-Request-Headers", "authorization"))
+                .andExpect(status().isOk())
+                .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.header().string("Access-Control-Allow-Origin", "http://localhost:5173"));
+        mockMvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.options(PROTEGIDO)
+                        .header("Origin", "https://otro-sitio.test")
+                        .header("Access-Control-Request-Method", "GET"))
+                .andExpect(status().isForbidden());
+    }
 }

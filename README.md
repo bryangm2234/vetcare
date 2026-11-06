@@ -16,7 +16,7 @@ La especificación de las 80 historias de usuario está en [docs/specs/HU-VetCar
 
 ## Tecnologías
 
-Java 17, Spring Boot 4.1, Spring Security, Spring Data MongoDB, springdoc-openapi, Maven Wrapper, JUnit 5, Mockito, GitHub Actions, Docker, Render y MongoDB Atlas. El frontend usará React + Vite + TypeScript en `frontend/` a partir de la Etapa 4.
+Java 17, Spring Boot 4.1, Spring Security, Spring Data MongoDB, springdoc-openapi, Maven Wrapper, JUnit 5, Mockito, GitHub Actions, Docker, Render y MongoDB Atlas. La interfaz web usa React, Vite y TypeScript; está en [frontend/](frontend/README.md).
 
 ## Empezar
 

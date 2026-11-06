@@ -23,7 +23,7 @@ Esto crea un archivo `.env` en esa carpeta con las claves y el administrador ini
 
 ## 3. Render
 
-1. En Render, entra a **New > Blueprint** y conecta el repositorio `vetcare`. Render lee `render.yaml` y propone los 5 servicios.
+1. En Render, entra a **New > Blueprint** y conecta el repositorio `vetcare`. Render lee `render.yaml` y propone los 5 servicios y el frontend.
 2. Escribe las variables que pide:
 
 | Variable | Servicios | Valor |
@@ -37,11 +37,15 @@ Esto crea un archivo `.env` en esa carpeta con las claves y el administrador ini
 | `HISTORIA_URL` | ms-farmacia, ms-facturacion | URL de ms-historia-clinica |
 | `FARMACIA_URL` | ms-historia-clinica, ms-facturacion | URL de ms-farmacia |
 | `VETCARE_CLAVE_PROCESO` | ms-agenda | Clave aleatoria para los recordatorios |
+| `VETCARE_CORS_ORIGENES` | Todos | URL del frontend, por ejemplo `https://vetcare-frontend.onrender.com` |
+| `VITE_URL_PACIENTES`, `VITE_URL_AGENDA`, `VITE_URL_HISTORIA`, `VITE_URL_FARMACIA`, `VITE_URL_FACTURACION` | vetcare-frontend | URL de cada microservicio |
 | `VETCARE_CORREO_REMITENTE`, `SPRING_MAIL_*` | ms-agenda, ms-facturacion | Servidor de correo. Sin esto, HU-030 y HU-070 no envían correos |
 
 Las URL tienen la forma `https://vetcare-ms-pacientes.onrender.com`. Si Render asigna otra, usa la que muestra el panel y actualiza las variables.
 
-3. Espera a que los 5 servicios queden en verde. Con el plan gratuito, cada servicio se duerme tras 15 minutos sin tráfico y tarda cerca de un minuto en despertar.
+Las variables `VITE_URL_*` se incorporan al compilar: si cambias una, vuelve a desplegar el frontend.
+
+3. Espera a que todos queden en verde. Con el plan gratuito, cada servicio se duerme tras 15 minutos sin tráfico y tarda cerca de un minuto en despertar.
 
 ## 4. Verificación
 
@@ -49,6 +53,7 @@ Comprueba en cada servicio:
 
 - `https://<servicio>.onrender.com/actuator/health` responde `UP` (HU-074 y HU-075).
 - `https://<servicio>.onrender.com/swagger-ui.html` muestra su documentación (HU-076).
+- `https://vetcare-frontend.onrender.com` permite iniciar sesión.
 
 Después ejecuta el flujo completo (HU-080). **Crea datos de prueba en la base de datos**, identificados con el prefijo `Flujo`:
 

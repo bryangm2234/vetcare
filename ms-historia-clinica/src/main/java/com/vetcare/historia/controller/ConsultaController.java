@@ -54,6 +54,14 @@ public class ConsultaController {
         return consultaService.abrir(solicitud.citaId(), jwt.getSubject());
     }
 
+    @GetMapping("/abiertas")
+    @PreAuthorize(Permisos.VETERINARIO)
+    @Operation(summary = "Consultar las consultas abiertas del veterinario autenticado")
+    @ApiResponse(responseCode = "200", description = "Consultas abiertas")
+    public List<ConsultaResponse> abiertas(@AuthenticationPrincipal Jwt jwt) {
+        return consultaService.abiertasDe(jwt.getSubject());
+    }
+
     @GetMapping("/items-pendientes")
     @PreAuthorize(Permisos.CAJERO)
     @Operation(summary = "Consultas cerradas pendientes de facturar")

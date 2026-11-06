@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -30,6 +31,15 @@ public class CajaController {
 
     public CajaController(CajaService cajaService) {
         this.cajaService = cajaService;
+    }
+
+    @GetMapping("/actual")
+    @PreAuthorize(Permisos.CAJERO)
+    @Operation(summary = "Consultar la caja abierta del cajero autenticado")
+    @ApiResponse(responseCode = "200", description = "Caja abierta")
+    @ApiResponse(responseCode = "422", description = "El cajero no tiene una caja abierta")
+    public Caja actual(@AuthenticationPrincipal Jwt jwt) {
+        return cajaService.abiertaDe(jwt.getSubject());
     }
 
     @PostMapping("/apertura")

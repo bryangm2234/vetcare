@@ -9,6 +9,8 @@ public interface HospitalizacionRepository extends MongoRepository<Hospitalizaci
 
     boolean existsByCubiculoOcupado(String cubiculo);
 
+    List<Hospitalizacion> findByEstadoOrderByFechaIngresoDesc(EstadoHospitalizacion estado);
+
     boolean existsByMascotaInternada(String mascotaId);
 
     List<Hospitalizacion> findByMascotaIdOrderByFechaIngresoDesc(String mascotaId);

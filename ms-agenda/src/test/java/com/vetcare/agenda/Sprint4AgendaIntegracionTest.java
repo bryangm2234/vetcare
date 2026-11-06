@@ -171,4 +171,21 @@ class Sprint4AgendaIntegracionTest {
                 .andExpect(jsonPath("$", hasSize(1)))
                 .andExpect(jsonPath("$[0].cantidad").value(1));
     }
+
+    @Test
+    void soporteDeInterfaz_listados() throws Exception {
+        horario();
+        cita("09:00");
+        cita("08:00");
+
+        enviar(get("/api/citas?fecha=" + LUNES), "RECEPCIONISTA", null)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(2)))
+                .andExpect(jsonPath("$[0].hora").value(org.hamcrest.Matchers.startsWith("08:00")));
+        enviar(get("/api/citas?fecha=" + LUNES), "AUXILIAR_VETERINARIO", null).andExpect(status().isOk());
+        enviar(get("/api/citas?fecha=" + LUNES), "CAJERO", null).andExpect(status().isForbidden());
+        enviar(get("/api/horarios"), "RECEPCIONISTA", null).andExpect(jsonPath("$[0].nombre").value("Dra. Pérez"));
+        enviar(get("/api/peluqueria/citas?fecha=" + LUNES), "PELUQUERIA", null).andExpect(jsonPath("$", hasSize(0)));
+        enviar(get("/api/peluqueria/citas?fecha=" + LUNES), "RECEPCIONISTA", null).andExpect(status().isForbidden());
+    }
 }
