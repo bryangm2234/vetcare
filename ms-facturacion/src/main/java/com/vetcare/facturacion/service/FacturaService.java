@@ -7,6 +7,7 @@ import com.vetcare.facturacion.dto.FacturaRequest;
 import com.vetcare.facturacion.dto.ItemPagoRequest;
 import com.vetcare.facturacion.dto.ItemPendiente;
 import com.vetcare.facturacion.dto.MascotaInfo;
+import com.vetcare.facturacion.dto.PaginaResponse;
 import com.vetcare.facturacion.exception.ConflictoException;
 import com.vetcare.facturacion.exception.DatosInvalidosException;
 import com.vetcare.facturacion.exception.RecursoNoEncontradoException;
@@ -26,6 +27,8 @@ import com.vetcare.facturacion.repository.TarifaRepository;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.OptimisticLockingFailureException;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.FindAndModifyOptions;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -174,6 +177,18 @@ public class FacturaService {
     public Factura buscar(String id) {
         return facturaRepository.findById(id)
                 .orElseThrow(() -> new RecursoNoEncontradoException("La factura no existe"));
+    }
+
+    public PaginaResponse<Factura> consultar(EstadoFactura estado, int pagina, int tamano) {
+        Query query = new Query();
+        if (estado != null) {
+            query.addCriteria(Criteria.where("estado").is(estado));
+        }
+        long total = mongoTemplate.count(query, Factura.class);
+        int paginaValida = PaginaResponse.paginaValida(pagina);
+        int tamanoValido = PaginaResponse.tamanoValido(tamano);
+        query.with(PageRequest.of(paginaValida, tamanoValido, Sort.by(Sort.Direction.DESC, "fecha")));
+        return PaginaResponse.de(mongoTemplate.find(query, Factura.class), f -> f, paginaValida, tamanoValido, total);
     }
 
     public List<Factura> dePropietario(String propietarioId) {

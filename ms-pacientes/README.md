@@ -18,6 +18,7 @@ Usuarios e inicio de sesión (D2), propietarios, mascotas, alergias y estado.
 | `MONGODB_URI` | En la nube | `mongodb://localhost:27017` | Conexión a MongoDB, sin nombre de base de datos |
 | `PORT` | No | `8081` | Puerto HTTP. Render lo define automáticamente |
 | `JWT_PUBLIC_KEY` | Sí | Ninguno | Clave pública RSA en Base64 para validar los JWT |
+| `VETCARE_CORS_ORIGENES` | En la nube | `http://localhost:5173` | Orígenes permitidos para la interfaz web, separados por coma |
 | `JWT_PRIVATE_KEY` | Sí | Ninguno | Clave privada RSA en Base64 para firmar los JWT. Solo la usa este servicio |
 | `VETCARE_ADMIN_CORREO` | Para crear el primer administrador | Ninguno | Correo del administrador inicial |
 | `VETCARE_ADMIN_CONTRASENA` | Para crear el primer administrador | Ninguno | Contraseña del administrador inicial |

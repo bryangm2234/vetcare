@@ -10,6 +10,8 @@ public interface ConsultaRepository extends MongoRepository<Consulta, String> {
 
     boolean existsByCitaId(String citaId);
 
+    List<Consulta> findByVeterinarioIdAndEstadoOrderByFechaAperturaDesc(String veterinarioId, EstadoConsulta estado);
+
     Optional<Consulta> findByCitaId(String citaId);
 
     List<Consulta> findByMascotaIdOrderByFechaAperturaDesc(String mascotaId);

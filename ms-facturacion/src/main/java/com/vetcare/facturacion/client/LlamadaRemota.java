@@ -4,6 +4,7 @@ import com.vetcare.facturacion.exception.ConflictoException;
 import com.vetcare.facturacion.exception.RecursoNoEncontradoException;
 import com.vetcare.facturacion.exception.ReglaNegocioException;
 import com.vetcare.facturacion.exception.ServicioNoDisponibleException;
+import java.util.Map;
 import java.util.function.Supplier;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
@@ -51,18 +52,29 @@ final class LlamadaRemota {
     private static RuntimeException traducir(String servicio, HttpClientErrorException ex) {
         HttpStatus estado = HttpStatus.resolve(ex.getStatusCode().value());
         if (estado == HttpStatus.NOT_FOUND) {
-            return new RecursoNoEncontradoException("El recurso no existe en " + servicio);
+            return new RecursoNoEncontradoException(mensajeRemoto(ex, "El recurso no existe en " + servicio));
         }
         if (estado == HttpStatus.FORBIDDEN) {
             return new AccessDeniedException("Acceso denegado por " + servicio);
         }
         if (estado == HttpStatus.CONFLICT) {
-            return new ConflictoException("La operación fue rechazada por conflicto en " + servicio);
+            return new ConflictoException(mensajeRemoto(ex, "La operación fue rechazada por conflicto en " + servicio));
         }
         if (estado == HttpStatus.UNPROCESSABLE_ENTITY) {
-            return new ReglaNegocioException("La operación fue rechazada por una regla de " + servicio);
+            return new ReglaNegocioException(mensajeRemoto(ex, "La operación fue rechazada por una regla de " + servicio));
         }
         return noDisponible(servicio);
+    }
+
+    /** Usa el mensaje estándar del otro microservicio (HU-079) para que el usuario vea la causa real. */
+    private static String mensajeRemoto(HttpClientErrorException ex, String porDefecto) {
+        try {
+            Map<?, ?> cuerpo = ex.getResponseBodyAs(Map.class);
+            Object mensaje = cuerpo != null ? cuerpo.get("mensaje") : null;
+            return mensaje instanceof String texto && !texto.isBlank() ? texto : porDefecto;
+        } catch (RuntimeException sinCuerpoLegible) {
+            return porDefecto;
+        }
     }
 
     private static ServicioNoDisponibleException noDisponible(String servicio) {

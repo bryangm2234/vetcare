@@ -4,6 +4,7 @@ import com.vetcare.historia.dto.AltaRequest;
 import com.vetcare.historia.dto.EvolucionRequest;
 import com.vetcare.historia.dto.HospitalizacionRequest;
 import com.vetcare.historia.dto.ItemPendienteResponse;
+import com.vetcare.historia.dto.MedicamentoDespachadoResponse;
 import com.vetcare.historia.dto.MarcaFacturadoRequest;
 import com.vetcare.historia.service.MarcadorFacturacion;
 import com.vetcare.historia.model.Hospitalizacion;
@@ -69,6 +70,23 @@ public class HospitalizacionController {
     @ApiResponse(responseCode = "422", description = "La mascota ya fue dada de alta")
     public Hospitalizacion darDeAlta(@PathVariable String id, @Valid @RequestBody AltaRequest solicitud) {
         return hospitalizacionService.darDeAlta(id, solicitud.indicaciones());
+    }
+
+    @GetMapping("/{id}/medicamentos-despachados")
+    @PreAuthorize(Permisos.ATENCION_HOSPITALARIA)
+    @Operation(summary = "Consultar los medicamentos ya despachados para la mascota hospitalizada")
+    @ApiResponse(responseCode = "200", description = "Medicamentos que se pueden administrar")
+    @ApiResponse(responseCode = "422", description = "La mascota ya fue dada de alta")
+    public List<MedicamentoDespachadoResponse> medicamentosDespachados(@PathVariable String id) {
+        return hospitalizacionService.medicamentosDespachados(id);
+    }
+
+    @GetMapping("/activas")
+    @PreAuthorize(Permisos.ATENCION_HOSPITALARIA)
+    @Operation(summary = "Consultar las hospitalizaciones activas")
+    @ApiResponse(responseCode = "200", description = "Hospitalizaciones activas")
+    public List<Hospitalizacion> activas() {
+        return hospitalizacionService.activas();
     }
 
     @GetMapping("/items-pendientes")

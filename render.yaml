@@ -13,6 +13,8 @@ services:
     envVars:
       - key: MONGODB_URI
         sync: false
+      - key: VETCARE_CORS_ORIGENES
+        sync: false
       - key: JWT_PUBLIC_KEY
         sync: false
       - key: JWT_PRIVATE_KEY
@@ -33,6 +35,8 @@ services:
     healthCheckPath: /actuator/health
     envVars:
       - key: MONGODB_URI
+        sync: false
+      - key: VETCARE_CORS_ORIGENES
         sync: false
       - key: JWT_PUBLIC_KEY
         sync: false
@@ -63,6 +67,8 @@ services:
     envVars:
       - key: MONGODB_URI
         sync: false
+      - key: VETCARE_CORS_ORIGENES
+        sync: false
       - key: JWT_PUBLIC_KEY
         sync: false
       - key: PACIENTES_URL
@@ -84,6 +90,8 @@ services:
     envVars:
       - key: MONGODB_URI
         sync: false
+      - key: VETCARE_CORS_ORIGENES
+        sync: false
       - key: JWT_PUBLIC_KEY
         sync: false
       - key: HISTORIA_URL
@@ -100,6 +108,8 @@ services:
     healthCheckPath: /actuator/health
     envVars:
       - key: MONGODB_URI
+        sync: false
+      - key: VETCARE_CORS_ORIGENES
         sync: false
       - key: JWT_PUBLIC_KEY
         sync: false
@@ -120,4 +130,29 @@ services:
       - key: SPRING_MAIL_USERNAME
         sync: false
       - key: SPRING_MAIL_PASSWORD
+        sync: false
+  - type: web
+    name: vetcare-frontend
+    runtime: static
+    rootDir: frontend
+    buildCommand: npm ci --include=dev && npm run build
+    staticPublishPath: dist
+    branch: main
+    autoDeploy: true
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    envVars:
+      - key: NODE_VERSION
+        value: "24"
+      - key: VITE_URL_PACIENTES
+        sync: false
+      - key: VITE_URL_AGENDA
+        sync: false
+      - key: VITE_URL_HISTORIA
+        sync: false
+      - key: VITE_URL_FARMACIA
+        sync: false
+      - key: VITE_URL_FACTURACION
         sync: false

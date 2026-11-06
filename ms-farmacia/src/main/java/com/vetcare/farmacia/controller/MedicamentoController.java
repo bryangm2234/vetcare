@@ -86,6 +86,15 @@ public class MedicamentoController {
         return medicamentoService.registrarLote(id, solicitud, jwt.getClaimAsString("correo"));
     }
 
+    @GetMapping("/api/medicamentos/{id}/lotes")
+    @PreAuthorize(Permisos.CONSULTA_PROVEEDORES)
+    @Operation(summary = "Consultar los lotes de un medicamento")
+    @ApiResponse(responseCode = "200", description = "Lotes, primero el que vence antes")
+    @ApiResponse(responseCode = "404", description = "El medicamento no existe")
+    public List<LoteResponse> lotes(@PathVariable String id) {
+        return medicamentoService.lotesDe(id);
+    }
+
     @GetMapping("/api/medicamentos/{id}/kardex")
     @PreAuthorize(Permisos.CONSULTA_PROVEEDORES)
     @Operation(summary = "Consultar el kardex de un medicamento")

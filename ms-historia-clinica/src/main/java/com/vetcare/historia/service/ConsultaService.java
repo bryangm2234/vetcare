@@ -97,6 +97,11 @@ public class ConsultaService {
         return respuesta(guardada);
     }
 
+    public List<ConsultaResponse> abiertasDe(String veterinarioId) {
+        return consultaRepository.findByVeterinarioIdAndEstadoOrderByFechaAperturaDesc(veterinarioId, EstadoConsulta.ABIERTA).stream()
+                .map(this::respuesta).toList();
+    }
+
     public ConsultaResponse obtener(String id) {
         return respuesta(buscar(id));
     }

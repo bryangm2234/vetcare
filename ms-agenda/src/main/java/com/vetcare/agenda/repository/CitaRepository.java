@@ -11,6 +11,8 @@ public interface CitaRepository extends MongoRepository<Cita, String> {
 
     boolean existsByClaveFranja(String claveFranja);
 
+    List<Cita> findByTipoAndFechaOrderByHora(TipoCita tipo, LocalDate fecha);
+
     List<Cita> findByRecursoIdAndFechaOrderByHora(String recursoId, LocalDate fecha);
 
     List<Cita> findByFechaAndEstadoAndRecordatorioEnviadoFalse(LocalDate fecha, EstadoCita estado);

@@ -409,4 +409,17 @@ class Sprint3FarmaciaIntegracionTest {
         vencerLote(loteId);
         enviar(post("/api/lotes/V-1/consumos"), "VETERINARIO", cuerpo).andExpect(status().isUnprocessableContent());
     }
+
+    @Test
+    void soporteDeInterfaz_lotesDeUnMedicamento() throws Exception {
+        String med = medicamento("MED-1", 0);
+        lote(med, "LEJANO", VENCE, 5);
+        lote(med, "PROXIMO", LocalDate.now().plusDays(10), 5);
+
+        enviar(get("/api/medicamentos/" + med + "/lotes"), "FARMACIA", null)
+                .andExpect(jsonPath("$", hasSize(2)))
+                .andExpect(jsonPath("$[0].numero").value("PROXIMO"));
+        enviar(get("/api/medicamentos/no-existe/lotes"), "FARMACIA", null).andExpect(status().isNotFound());
+        enviar(get("/api/medicamentos/" + med + "/lotes"), "CAJERO", null).andExpect(status().isForbidden());
+    }
 }

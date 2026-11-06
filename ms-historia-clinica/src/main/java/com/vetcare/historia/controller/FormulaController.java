@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -55,6 +56,14 @@ public class FormulaController {
     @ApiResponse(responseCode = "422", description = "La fórmula ya no se puede anular")
     public FormulaResponse anular(@PathVariable String id, @Valid @RequestBody AnulacionRequest solicitud) {
         return formulaService.anular(id, solicitud.motivo());
+    }
+
+    @GetMapping("/despachables")
+    @PreAuthorize(Permisos.CONSULTA_VIGENCIA)
+    @Operation(summary = "Consultar las fórmulas vigentes con cantidades pendientes")
+    @ApiResponse(responseCode = "200", description = "Fórmulas que se pueden despachar")
+    public List<FormulaResponse> despachables() {
+        return formulaService.despachables();
     }
 
     @GetMapping("/{id}/vigencia")

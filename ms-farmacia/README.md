@@ -18,6 +18,7 @@ Medicamentos, lotes, despachos, kardex, proveedores y órdenes de compra.
 | `MONGODB_URI` | En la nube | `mongodb://localhost:27017` | Conexión a MongoDB, sin nombre de base de datos |
 | `PORT` | No | `8084` | Puerto HTTP. Render lo define automáticamente |
 | `JWT_PUBLIC_KEY` | Sí | Ninguno | Clave pública RSA en Base64 para validar los JWT |
+| `VETCARE_CORS_ORIGENES` | En la nube | `http://localhost:5173` | Orígenes permitidos para la interfaz web, separados por coma |
 | `HISTORIA_URL` | En la nube | `http://localhost:8083` | URL de ms-historia-clinica |
 
 ## Ejecutar en PowerShell
@@ -57,6 +58,7 @@ Las demás rutas exigen `Authorization: Bearer <token>`: responden 401 sin un to
 | `GET /api/medicamentos?texto=&page=&size=` | Farmacia, veterinario, administrador | HU-051 |
 | `GET /api/medicamentos/{id}` | Farmacia, veterinario, administrador | HU-051 |
 | `POST /api/medicamentos/{id}/lotes` | Farmacia | HU-052 |
+| `GET /api/medicamentos/{id}/lotes` | Farmacia, administrador | D20 |
 | `POST /api/despachos` | Farmacia | HU-053 |
 | `GET /api/despachos/items-pendientes` | Cajero, administrador | HU-053 |
 | `PATCH /api/despachos/items-facturados` | Cajero, administrador | HU-061 |

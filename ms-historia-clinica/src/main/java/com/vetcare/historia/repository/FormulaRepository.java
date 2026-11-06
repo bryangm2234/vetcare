@@ -7,4 +7,6 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 public interface FormulaRepository extends MongoRepository<Formula, String> {
 
     List<Formula> findByMascotaIdOrderByFechaDesc(String mascotaId);
+
+    List<Formula> findByEstadoInOrderByFechaDesc(List<com.vetcare.historia.model.EstadoFormula> estados);
 }

@@ -4,7 +4,9 @@ import com.vetcare.facturacion.dto.AjustesFacturaRequest;
 import com.vetcare.facturacion.dto.AnulacionRequest;
 import com.vetcare.facturacion.dto.FacturaRequest;
 import com.vetcare.facturacion.dto.ItemPagoRequest;
+import com.vetcare.facturacion.dto.PaginaResponse;
 import com.vetcare.facturacion.dto.PagoRequest;
+import com.vetcare.facturacion.model.EstadoFactura;
 import com.vetcare.facturacion.model.Factura;
 import com.vetcare.facturacion.security.Permisos;
 import com.vetcare.facturacion.service.EnvioFacturaService;
@@ -23,6 +25,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -49,6 +52,16 @@ public class FacturaController {
     @ApiResponse(responseCode = "503", description = "Un microservicio de origen no responde; no se crea la factura")
     public Factura generar(@Valid @RequestBody FacturaRequest solicitud, @AuthenticationPrincipal Jwt jwt) {
         return facturaService.generar(solicitud, jwt.getClaimAsString("correo"));
+    }
+
+    @GetMapping
+    @PreAuthorize(Permisos.CONSULTA_TARIFAS)
+    @Operation(summary = "Consultar facturas, de la más reciente a la más antigua")
+    @ApiResponse(responseCode = "200", description = "Facturas paginadas")
+    public PaginaResponse<Factura> consultar(@RequestParam(required = false) EstadoFactura estado,
+                                             @RequestParam(defaultValue = "0") int page,
+                                             @RequestParam(defaultValue = "20") int size) {
+        return facturaService.consultar(estado, page, size);
     }
 
     @GetMapping("/{id}")

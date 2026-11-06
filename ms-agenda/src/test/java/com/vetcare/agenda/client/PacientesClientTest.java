@@ -69,6 +69,17 @@ class PacientesClientTest {
     }
 
     @Test
+    void conservaElMensajeDelServicioRemoto() {
+        servidor.expect(requestTo(URL)).andRespond(withResourceNotFound()
+                .contentType(MediaType.APPLICATION_JSON).body("""
+                        {"status":404,"mensaje":"La mascota no existe"}"""));
+
+        assertThatThrownBy(() -> cliente.mascota("m1"))
+                .isInstanceOf(RecursoNoEncontradoException.class)
+                .hasMessage("La mascota no existe");
+    }
+
+    @Test
     void mascotaAjenaResponde403() {
         servidor.expect(requestTo(URL)).andRespond(withStatus(HttpStatus.FORBIDDEN));
 

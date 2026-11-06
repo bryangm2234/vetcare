@@ -27,6 +27,8 @@ springdoc:
     path: /swagger-ui.html
 
 vetcare:
+  cors:
+    origenes: ${VETCARE_CORS_ORIGENES:http://localhost:5173}
   jwt:
     public-key: ${JWT_PUBLIC_KEY:}
   servicios:

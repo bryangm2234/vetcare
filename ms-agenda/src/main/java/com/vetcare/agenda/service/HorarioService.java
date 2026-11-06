@@ -63,6 +63,10 @@ public class HorarioService {
         return guardado;
     }
 
+    public List<Horario> veterinarios() {
+        return horarioRepository.findByTipo(TipoCita.VETERINARIA);
+    }
+
     public Horario obtener(String recursoId) {
         return horarioRepository.findById(recursoId)
                 .orElseThrow(() -> new RecursoNoEncontradoException("El recurso no tiene horario configurado"));

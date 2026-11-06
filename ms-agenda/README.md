@@ -18,6 +18,7 @@ Horarios y cupos, citas, disponibilidad, llegada de pacientes y peluquería.
 | `MONGODB_URI` | En la nube | `mongodb://localhost:27017` | Conexión a MongoDB, sin nombre de base de datos |
 | `PORT` | No | `8082` | Puerto HTTP. Render lo define automáticamente |
 | `JWT_PUBLIC_KEY` | Sí | Ninguno | Clave pública RSA en Base64 para validar los JWT |
+| `VETCARE_CORS_ORIGENES` | En la nube | `http://localhost:5173` | Orígenes permitidos para la interfaz web, separados por coma |
 | `PACIENTES_URL` | En la nube | `http://localhost:8081` | URL de ms-pacientes |
 | `VETCARE_CLAVE_PROCESO` | Para HU-030 | Ninguno | Clave de la ejecución diaria de recordatorios, enviada en `X-Clave-Proceso` |
 | `VETCARE_CORREO_REMITENTE` | Para HU-030 | Ninguno | Remitente de los correos |
@@ -64,6 +65,9 @@ Las demás rutas exigen `Authorization: Bearer <token>`: responden 401 sin un to
 | `PATCH /api/citas/{id}/cancelacion` | Recepcionista | HU-025 |
 | `PATCH /api/citas/{id}/llegada` | Recepcionista | HU-026 |
 | `GET /api/citas/mi-agenda?fecha=` | Veterinario | HU-027 |
+| `GET /api/citas?fecha=` | Recepcionista, veterinario, auxiliar, administrador | D20 |
+| `GET /api/horarios` | Recepcionista, administrador, propietario, peluquería | D20 |
+| `GET /api/peluqueria/citas?fecha=` | Peluquería | D20 |
 | `PATCH /api/citas/{id}/atencion` | Veterinario | HU-035 |
 | `POST /api/portal/citas` | Propietario | HU-024 |
 | `GET /api/portal/citas` | Propietario | HU-071 |

@@ -18,6 +18,7 @@ Tarifas, facturas, pagos, abonos, caja y reportes financieros.
 | `MONGODB_URI` | En la nube | `mongodb://localhost:27017` | Conexión a MongoDB, sin nombre de base de datos |
 | `PORT` | No | `8085` | Puerto HTTP. Render lo define automáticamente |
 | `JWT_PUBLIC_KEY` | Sí | Ninguno | Clave pública RSA en Base64 para validar los JWT |
+| `VETCARE_CORS_ORIGENES` | En la nube | `http://localhost:5173` | Orígenes permitidos para la interfaz web, separados por coma |
 | `PACIENTES_URL` | En la nube | `http://localhost:8081` | URL de ms-pacientes |
 | `AGENDA_URL` | En la nube | `http://localhost:8082` | URL de ms-agenda |
 | `HISTORIA_URL` | En la nube | `http://localhost:8083` | URL de ms-historia-clinica |
@@ -62,6 +63,8 @@ Las demás rutas exigen `Authorization: Bearer <token>`: responden 401 sin un to
 | `GET /api/tarifas` | Cajero, administrador | HU-062 |
 | `POST /api/facturas` | Cajero | HU-061 |
 | `GET /api/facturas/{id}` | Cajero, administrador | HU-061 |
+| `GET /api/facturas?estado=&page=&size=` | Cajero, administrador | D20 |
+| `GET /api/cajas/actual` | Cajero | D20 |
 | `PATCH /api/facturas/{id}/ajustes` | Cajero | HU-063 |
 | `POST /api/facturas/{id}/pagos` | Cajero | HU-064 |
 | `PATCH /api/facturas/{id}/anulacion` | Cajero | HU-065 |
