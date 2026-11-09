@@ -13,8 +13,8 @@ Cruce de los 287 escenarios Gherkin de [HU-VetCare-SDD.md](../specs/HU-VetCare-S
 
 | Estado | Historias | Escenarios |
 |---|---|---|
-| Cubierta | 73 | 265 |
-| Parcial | 3 | 10 |
+| Cubierta | 74 | 267 |
+| Parcial | 2 | 8 |
 | Pendiente de la nube | 4 | 12 |
 
 ## Reglas de negocio
@@ -39,7 +39,7 @@ Cruce de los 287 escenarios Gherkin de [HU-VetCare-SDD.md](../specs/HU-VetCare-S
 | HU-007 Crear el repositorio en GitHub con los 5 microservicios Spring Boot gestionados con Maven | 2 | Cubierta | GitHub Actions compila cada servicio y el trabajo `secretos` busca credenciales. |
 | HU-008 Conectar cada microservicio a su propia base de datos MongoDB | 3 | Cubierta | `AgendaApplicationTests.hu008_sinMongoDbLaSaludEsPublicaYRespondeDown`<br>`AgendaApplicationTests.hu008_usaSuPropiaBaseDeDatos`<br>`FacturacionApplicationTests.hu008_sinMongoDbLaSaludEsPublicaYRespondeDown`<br>`FacturacionApplicationTests.hu008_usaSuPropiaBaseDeDatos`<br>`FarmaciaApplicationTests.hu008_sinMongoDbLaSaludEsPublicaYRespondeDown`<br>`FarmaciaApplicationTests.hu008_usaSuPropiaBaseDeDatos`<br>`HistoriaClinicaApplicationTests.hu008_sinMongoDbLaSaludEsPublicaYRespondeDown`<br>`HistoriaClinicaApplicationTests.hu008_usaSuPropiaBaseDeDatos`<br>`PacientesApplicationTests.hu008_sinMongoDbLaSaludEsPublicaYRespondeDown`<br>`PacientesApplicationTests.hu008_usaSuPropiaBaseDeDatos`<br>`Sprint1IntegracionTest.hu008_usaLaBaseDePrueba` |
 | HU-009 Registrar una auditoría de accesos y operaciones críticas | 3 | Cubierta | `Sprint1IntegracionTest.hu002_hu004_hu009_accesoDesactivacionYAuditoria` |
-| HU-010 Documentar los endpoints de autenticación y usuarios en Swagger | 2 | Parcial | "Prueba con token": solo se comprueba el esquema Bearer en OpenAPI; falta probarlo a mano en Swagger UI.<br>`AgendaApplicationTests.hu010_laDocumentacionEsPublica`<br>`ApiPacientesWebTest.hu010_hu020_laDocumentacionIncluyeLosEndpoints`<br>`FacturacionApplicationTests.hu010_laDocumentacionEsPublica`<br>`FarmaciaApplicationTests.hu010_laDocumentacionEsPublica`<br>`HistoriaClinicaApplicationTests.hu010_laDocumentacionEsPublica`<br>`PacientesApplicationTests.hu010_laDocumentacionEsPublica` |
+| HU-010 Documentar los endpoints de autenticación y usuarios en Swagger | 2 | Cubierta | "Prueba con token": comprobado a mano en Swagger UI el 9 de noviembre de 2026 (inicio de sesión, **Authorize** y `GET /api/usuarios` con respuesta 200).<br>`AgendaApplicationTests.hu010_laDocumentacionEsPublica`<br>`ApiPacientesWebTest.hu010_hu020_laDocumentacionIncluyeLosEndpoints`<br>`FacturacionApplicationTests.hu010_laDocumentacionEsPublica`<br>`FarmaciaApplicationTests.hu010_laDocumentacionEsPublica`<br>`HistoriaClinicaApplicationTests.hu010_laDocumentacionEsPublica`<br>`PacientesApplicationTests.hu010_laDocumentacionEsPublica` |
 | HU-011 Registrar propietarios con documento, nombre, teléfono, correo y dirección | 3 | Cubierta | `ApiPacientesWebTest.hu011_correoInvalidoResponde400ConElCampo`<br>`ApiPacientesWebTest.hu011_otroRolNoRegistraPropietarios`<br>`PropietarioServiceTest.hu011_documentoDuplicado`<br>`PropietarioServiceTest.hu011_registroGuardaElNombreNormalizadoParaBuscar`<br>`Sprint1IntegracionTest.hu011_documentoDuplicado` |
 | HU-012 Registrar una mascota con nombre, especie, raza, sexo, fecha de nacimiento y peso asociada a su propietario | 3 | Cubierta | `ApiPacientesWebTest.hu012_fechaFuturaResponde400`<br>`ApiPacientesWebTest.hu012_pesoNoPositivoResponde400`<br>`MascotaServiceTest.hu012_propietarioInexistente`<br>`MascotaServiceTest.hu012_registroValidoQuedaActiva`<br>`Sprint1IntegracionTest.hu012_mascotaConPropietarioInexistente` |
 | HU-013 Buscar propietarios por documento o nombre | 3 | Cubierta | `PropietarioServiceTest.hu013_normalizaTildesYMayusculas`<br>`Sprint1IntegracionTest.hu013_buscaPorDocumentoYNombreSinTildes` |
@@ -127,4 +127,15 @@ Recorrido con la interfaz y los 5 servicios reales, sobre bases temporales. Se c
 
 **Error encontrado:** el formulario de reprogramar no ofrecía horas. Se corrigió y ahora tiene su prueba.
 
-**Sin comprobar a mano:** la vista de escritorio por una persona, Swagger UI con token y correo real.
+**Sin comprobar a mano:** la vista de escritorio por una persona y el correo real.
+
+## Verificación del Sprint 1
+
+El 9 de noviembre de 2026 se revisaron HU-001 a HU-020 contra `ms-pacientes` en ejecución, con una base temporal:
+
+- Las 79 pruebas de `ms-pacientes` pasan.
+- Se recorrieron en vivo los escenarios Gherkin de las 20 historias, con 64 comprobaciones correctas, incluido el arranque que no crea un segundo administrador.
+- Se comprobó Swagger UI con token (HU-010).
+- La interfaz tiene pantalla para cada historia: Usuarios, Mi cuenta, Propietarios, Reportes y Auditoría.
+
+Los escenarios que dependen de otros servicios se cubren con sus pruebas: el rechazo de citas para una mascota inactiva (HU-017) en `Sprint2AgendaIntegracionTest.hu022_fueraDeHorarioFechaPasadaYMascotaNoActiva` y la auditoría de anulación de facturas (HU-009) en `Sprint4FacturacionIntegracionTest.hu065_anulacion`.
